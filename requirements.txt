@@ -1,5 +1,10 @@
 fastapi
 uvicorn
 supabase
-requests
 httpx
+rispy
+pdfplumber
+pandas
+openpyxl
+Pillow
+pytesseract
