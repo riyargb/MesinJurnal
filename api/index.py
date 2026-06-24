@@ -1,15 +1,15 @@
 import os
 import io
 import csv
-import re
 import httpx
+import rispy
 import pandas as pd
 import pdfplumber
 import pytesseract
 from PIL import Image
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from supabase import create_client, Client
 
 app = FastAPI()
@@ -29,8 +29,7 @@ def parse_ris(content: str):
     for line in content.splitlines():
         line = line.strip()
         if line.startswith("TY  -"):
-            entry = {}
-            authors = []
+            entry = {}; authors = []
         elif line.startswith("TI  -") or line.startswith("T1  -"):
             entry["judul"] = line.split("-", 1)[1].strip()
         elif line.startswith("AU  -") or line.startswith("A1  -"):
@@ -43,6 +42,14 @@ def parse_ris(content: str):
             entry["doi"] = line.split("-", 1)[1].strip()
         elif line.startswith("JF  -") or line.startswith("JO  -") or line.startswith("T2  -"):
             entry["jurnal"] = line.split("-", 1)[1].strip()
+        elif line.startswith("SN  -"):
+            entry["issn"] = line.split("-", 1)[1].strip()
+        elif line.startswith("UR  -"):
+            entry["url"] = line.split("-", 1)[1].strip()
+        elif line.startswith("KW  -"):
+            if "keywords" not in entry:
+                entry["keywords"] = []
+            entry["keywords"].append(line.split("-", 1)[1].strip())
         elif line.startswith("ER  -"):
             entry["penulis"] = authors
             if "judul" in entry:
@@ -89,7 +96,7 @@ def cari_jurnal(q: str):
     payload = {"q": q + " jurnal ilmiah peer reviewed", "gl": "id", "hl": "id"}
     r = httpx.post("https://google.serper.dev/search", json=payload, headers=headers)
     data = r.json()
-    hasil = [{"judul": item.get("title"), "link": item.get("link"), "snippet": item.get("snippet")} for item in data.get("organic", [])]
+    hasil = [{"judul":item.get("title"),"link":item.get("link"),"snippet":item.get("snippet")} for item in data.get("organic",[])]
     return {"query": q, "hasil": hasil}
 
 @app.get("/doi")
@@ -97,16 +104,64 @@ def fetch_doi(doi: str):
     try:
         r = httpx.get(f"https://api.crossref.org/works/{doi}", timeout=10)
         d = r.json().get("message", {})
+        date_parts = d.get("published-print", d.get("published-online", {})).get("date-parts", [[""]])
+        tahun = str(date_parts[0][0]) if date_parts and date_parts[0] else ""
         return {
             "judul": d.get("title", [""])[0],
             "penulis": [f"{a.get('given','')} {a.get('family','')}" for a in d.get("author", [])],
-            "tahun": str(d.get("published-print", d.get("published-online", {})).get("date-parts", [[""]])[0][0]),
+            "tahun": tahun,
             "jurnal": d.get("container-title", [""])[0],
-            "abstrak": d.get("abstract", ""),
-            "doi": doi
+            "abstrak": d.get("abstract", "").replace("<jats:p>","").replace("</jats:p>",""),
+            "doi": doi,
+            "url": f"https://doi.org/{doi}"
         }
     except Exception as e:
         return {"error": str(e)}
+
+@app.get("/pdf")
+def cari_pdf(doi: str = None, judul: str = None):
+    try:
+        if doi:
+            r = httpx.get(f"https://api.unpaywall.org/v2/{doi}?email=mesin@jurnal.app", timeout=10)
+            if r.status_code == 200:
+                data = r.json()
+                oa = data.get("best_oa_location")
+                if oa and oa.get("url_for_pdf"):
+                    return {"pdf_url": oa["url_for_pdf"], "source": "unpaywall"}
+        q = judul or doi or ""
+        headers = {"X-API-KEY": SERPER_API_KEY, "Content-Type": "application/json"}
+        payload = {"q": q + " filetype:pdf site:researchgate.net OR site:semanticscholar.org OR site:academia.edu"}
+        r = httpx.post("https://google.serper.dev/search", json=payload, headers=headers)
+        hasil = r.json().get("organic", [])
+        if hasil:
+            return {"pdf_url": hasil[0]["link"], "source": "serper"}
+        return {"pdf_url": None, "source": None}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/export/ris")
+async def export_ris(data: list):
+    output = ""
+    for item in data:
+        output += "TY  - JOUR\n"
+        if item.get("judul"): output += f"TI  - {item['judul']}\n"
+        for p in (item.get("penulis") or []):
+            output += f"AU  - {p}\n"
+        if item.get("tahun"): output += f"PY  - {item['tahun']}\n"
+        if item.get("jurnal"): output += f"JF  - {item['jurnal']}\n"
+        if item.get("abstrak"): output += f"AB  - {item['abstrak']}\n"
+        if item.get("doi"): output += f"DO  - {item['doi']}\n"
+        output += "ER  -\n\n"
+    return StreamingResponse(io.BytesIO(output.encode()), media_type="application/x-research-info-systems", headers={"Content-Disposition": "attachment; filename=export.ris"})
+
+@app.post("/export/csv")
+async def export_csv(data: list):
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=["judul","penulis","tahun","jurnal","abstrak","doi"])
+    writer.writeheader()
+    for item in data:
+        writer.writerow({"judul":item.get("judul",""),"penulis":", ".join(item.get("penulis",[]) if isinstance(item.get("penulis"),list) else [str(item.get("penulis",""))]),"tahun":item.get("tahun",""),"jurnal":item.get("jurnal",""),"abstrak":item.get("abstrak",""),"doi":item.get("doi","")})
+    return StreamingResponse(io.BytesIO(output.getvalue().encode()), media_type="text/csv", headers={"Content-Disposition": "attachment; filename=export.csv"})
 
 @app.post("/upload")
 async def upload_files(files: list[UploadFile] = File(...)):
@@ -133,29 +188,3 @@ async def upload_files(files: list[UploadFile] = File(...)):
         except Exception as e:
             semua_hasil.append({"file": file.filename, "error": str(e)})
     return {"total_file": len(semua_hasil), "hasil": semua_hasil}
-
-@app.get("/pdf")
-def cari_pdf(doi: str = None, judul: str = None):
-    try:
-        if doi:
-            # Unpaywall dulu
-            r = httpx.get(f"https://api.unpaywall.org/v2/{doi}?email=mesin@jurnal.app", timeout=10)
-            if r.status_code == 200:
-                data = r.json()
-                oa = data.get("best_oa_location")
-                if oa and oa.get("url_for_pdf"):
-                    return {"pdf_url": oa["url_for_pdf"], "source": "unpaywall"}
-        # Fallback ke Serper
-        q = judul or doi or ""
-        headers = {"X-API-KEY": SERPER_API_KEY, "Content-Type": "application/json"}
-        payload = {"q": q + " filetype:pdf", "gl": "id", "hl": "id"}
-        r = httpx.post("https://google.serper.dev/search", json=payload, headers=headers)
-        hasil = r.json().get("organic", [])
-        pdf_links = [h for h in hasil if ".pdf" in h.get("link","").lower()]
-        if pdf_links:
-            return {"pdf_url": pdf_links[0]["link"], "source": "serper"}
-        elif hasil:
-            return {"pdf_url": hasil[0]["link"], "source": "serper_page"}
-        return {"pdf_url": None, "source": None}
-    except Exception as e:
-        return {"error": str(e)}

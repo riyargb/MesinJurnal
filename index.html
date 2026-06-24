@@ -6,6 +6,9 @@
 <title>Mesin Jurnal</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mesin Jurnal">
+<link rel="apple-touch-icon" href="/b36a945f5d77d01973338ed08078ff79.jpg">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: sans-serif; background: #f0f4f8; color: #333; }
@@ -16,26 +19,36 @@
   label { font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #555; }
   input[type=text] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
   input[type=file] { margin-top: 10px; width: 100%; border: 2px dashed #93c5fd; padding: 12px; border-radius: 8px; background: #eff6ff; cursor: pointer; }
-  button { margin-top: 12px; padding: 10px 24px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; }
-  button:hover { background: #1d4ed8; }
-  button:disabled { background: #93c5fd; cursor: not-allowed; }
-  .jurnal-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: box-shadow 0.2s; }
-  .jurnal-card:hover { box-shadow: 0 4px 12px rgba(37,99,235,0.12); }
+  .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; }
+  .btn-primary { background: #2563eb; color: white; margin-top: 12px; padding: 10px 24px; font-size: 15px; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
+  .btn-sm { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; margin-right: 6px; margin-top: 6px; }
+  .btn-sm:hover { background: #dbeafe; }
+  .btn-green { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+  .btn-green:hover { background: #dcfce7; }
+  .btn-export { background: #faf5ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+  .btn-export:hover { background: #f3e8ff; }
+  .jurnal-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
   .jurnal-title { font-size: 15px; font-weight: bold; color: #1e40af; margin-bottom: 8px; line-height: 1.4; }
   .jurnal-title a { color: #1e40af; text-decoration: none; }
   .jurnal-title a:hover { text-decoration: underline; }
   .jurnal-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   .tag { display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border-radius: 6px; padding: 3px 10px; font-size: 12px; border: 1px solid #bfdbfe; }
-  .tag-doi { background: #f0fdf4; color: #166534; border-color: #bbf7d0; cursor: pointer; }
-  .tag-doi a { color: #166534; text-decoration: none; }
   .jurnal-abstract { font-size: 13px; color: #555; line-height: 1.6; background: #f8faff; padding: 10px; border-radius: 6px; border-left: 3px solid #93c5fd; margin-top: 8px; display: none; }
   .jurnal-abstract.show { display: block; }
-  .toggle-abstract { font-size: 12px; color: #2563eb; cursor: pointer; background: none; border: none; padding: 4px 0; margin-top: 4px; font-weight: bold; }
+  .jurnal-actions { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
   .file-header { background: #dbeafe; padding: 8px 12px; border-radius: 6px; font-weight: bold; margin-bottom: 10px; margin-top: 16px; color: #1e40af; display: flex; align-items: center; justify-content: space-between; }
   .badge { background: #2563eb; color: white; border-radius: 99px; padding: 2px 10px; font-size: 12px; }
+  .export-bar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
   .loading { color: #2563eb; font-style: italic; margin-top: 10px; }
   .error { color: red; margin-top: 10px; }
   .summary { color: #555; margin: 10px 0; font-size: 14px; }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; }
+  .modal.show { display: flex; }
+  .modal-box { background: white; border-radius: 12px; padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+  .modal-title { font-size: 16px; font-weight: bold; color: #1e40af; margin-bottom: 12px; }
+  .modal-close { float: right; cursor: pointer; font-size: 20px; color: #999; }
 </style>
 </head>
 <body>
@@ -46,7 +59,7 @@
     <h2>🔍 Cari Jurnal</h2>
     <label>Kata kunci pencarian</label>
     <input type="text" id="query" placeholder="contoh: peer support mental health..." onkeydown="if(event.key==='Enter') cariJurnal()">
-    <button onclick="cariJurnal()" id="btnCari">Cari</button>
+    <button class="btn btn-primary" onclick="cariJurnal()" id="btnCari">Cari</button>
     <div id="hasil-cari"></div>
   </div>
 
@@ -54,37 +67,44 @@
     <h2>📂 Upload File Referensi</h2>
     <label>Format: .ris .pdf .txt .csv .xlsx .png .jpg (maks 4 file)</label>
     <input type="file" id="fileInput" accept=".ris,.pdf,.txt,.csv,.xlsx,.png,.jpg,.jpeg" multiple>
-    <button onclick="uploadFile()" id="btnUpload">Upload & Parse</button>
+    <button class="btn btn-primary" onclick="uploadFile()" id="btnUpload">Upload & Parse</button>
     <div id="hasil-upload"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <span class="modal-close" onclick="closeModal()">✕</span>
+    <div class="modal-title" id="modal-title">Detail Jurnal</div>
+    <div id="modal-body"></div>
   </div>
 </div>
 
 <script>
 if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 
-let abstractCounter = 0;
+let allData = [];
+let absCounter = 0;
 
-function renderJurnalCard(item) {
-  const id = 'abs-' + (abstractCounter++);
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+function renderJurnalCard(item, idx) {
+  const id = 'abs-' + (absCounter++);
   const penulis = Array.isArray(item.penulis) ? item.penulis.join(", ") : (item.penulis || "");
   const judul = item.judul || item.title || "(Judul tidak tersedia)";
-  const link = item.link ? `<a href="${item.link}" target="_blank">${judul}</a>` : judul;
-
+  const titleHtml = item.link ? `<a href="${item.link}" target="_blank">${judul}</a>` : judul;
   let meta = '';
   if (item.tahun) meta += `<span class="tag">📅 ${item.tahun}</span>`;
-  if (item.jurnal) meta += `<span class="tag">📖 ${item.jurnal}</span>`;
-  if (penulis) meta += `<span class="tag">👤 ${penulis.length > 80 ? penulis.substring(0,80)+'...' : penulis}</span>`;
-  if (item.doi) meta += `<span class="tag tag-doi"><a href="https://doi.org/${item.doi}" target="_blank">🔗 DOI: ${item.doi}</a></span>`;
-
+  if (item.jurnal) meta += `<span class="tag">📖 ${item.jurnal.length>40?item.jurnal.substring(0,40)+'...':item.jurnal}</span>`;
+  if (penulis) meta += `<span class="tag">👤 ${penulis.length>60?penulis.substring(0,60)+'...':penulis}</span>`;
   const abstrak = item.abstrak || item.snippet || "";
-  const absBlock = abstrak ? `
-    <button class="toggle-abstract" onclick="toggleAbs('${id}')">▼ Lihat Abstrak</button>
-    <div class="jurnal-abstract" id="${id}">${abstrak}</div>` : '';
-
+  const absBlock = abstrak ? `<button class="btn btn-sm" onclick="toggleAbs('${id}')">▼ Abstrak</button><div class="jurnal-abstract" id="${id}">${abstrak}</div>` : '';
+  const doiBtn = item.doi ? `<button class="btn btn-sm" onclick="fetchDOI('${item.doi}')">🔗 Detail DOI</button>` : '';
+  const pdfBtn = `<button class="btn btn-sm btn-green" onclick="cariPDF('${item.doi||''}','${judul.replace(/'/g,"\\'")}')">📄 Cari PDF</button>`;
   return `<div class="jurnal-card">
-    <div class="jurnal-title">${link}</div>
+    <div class="jurnal-title">${titleHtml}</div>
     <div class="jurnal-meta">${meta}</div>
-    ${absBlock}
+    <div class="jurnal-actions">${absBlock}${doiBtn}${pdfBtn}</div>
   </div>`;
 }
 
@@ -92,7 +112,61 @@ function toggleAbs(id) {
   const el = document.getElementById(id);
   const btn = el.previousElementSibling;
   el.classList.toggle('show');
-  btn.textContent = el.classList.contains('show') ? '▲ Sembunyikan Abstrak' : '▼ Lihat Abstrak';
+  btn.textContent = el.classList.contains('show') ? '▲ Abstrak' : '▼ Abstrak';
+}
+
+async function fetchDOI(doi) {
+  document.getElementById('modal-title').textContent = 'Memuat detail...';
+  document.getElementById('modal-body').innerHTML = '<p class="loading">⏳ Mengambil data dari CrossRef...</p>';
+  document.getElementById('modal').classList.add('show');
+  try {
+    const res = await fetch('/doi?doi=' + encodeURIComponent(doi));
+    const d = await res.json();
+    if (d.error) { document.getElementById('modal-body').innerHTML = `<p class="error">${d.error}</p>`; return; }
+    const penulis = Array.isArray(d.penulis) ? d.penulis.join(", ") : d.penulis;
+    document.getElementById('modal-title').textContent = d.judul || 'Detail Jurnal';
+    document.getElementById('modal-body').innerHTML = `
+      <p><b>Penulis:</b> ${penulis||'-'}</p><br>
+      <p><b>Tahun:</b> ${d.tahun||'-'}</p><br>
+      <p><b>Jurnal:</b> ${d.jurnal||'-'}</p><br>
+      <p><b>DOI:</b> <a href="https://doi.org/${doi}" target="_blank">${doi}</a></p><br>
+      ${d.abstrak ? `<p><b>Abstrak:</b></p><br><p style="font-size:13px;line-height:1.6;background:#f8faff;padding:10px;border-radius:6px">${d.abstrak}</p>` : ''}
+    `;
+  } catch(e) { document.getElementById('modal-body').innerHTML = `<p class="error">${e.message}</p>`; }
+}
+
+async function cariPDF(doi, judul) {
+  document.getElementById('modal-title').textContent = 'Mencari PDF...';
+  document.getElementById('modal-body').innerHTML = '<p class="loading">⏳ Mencari PDF open access...</p>';
+  document.getElementById('modal').classList.add('show');
+  try {
+    const params = new URLSearchParams();
+    if (doi) params.append('doi', doi);
+    if (judul) params.append('judul', judul);
+    const res = await fetch('/pdf?' + params.toString());
+    const d = await res.json();
+    if (d.pdf_url) {
+      document.getElementById('modal-body').innerHTML = `
+        <p>✅ PDF ditemukan via <b>${d.source}</b></p><br>
+        <a href="${d.pdf_url}" target="_blank" class="btn btn-primary" style="display:inline-block;text-decoration:none">📥 Buka PDF</a>
+      `;
+    } else {
+      document.getElementById('modal-body').innerHTML = '<p>❌ PDF tidak ditemukan secara gratis.</p>';
+    }
+  } catch(e) { document.getElementById('modal-body').innerHTML = `<p class="error">${e.message}</p>`; }
+}
+
+function exportData(format) {
+  if (allData.length === 0) return alert('Tidak ada data untuk diekspor!');
+  fetch('/export/' + format, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(allData)
+  }).then(r => r.blob()).then(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'export.' + format; a.click();
+  });
 }
 
 async function cariJurnal() {
@@ -104,18 +178,14 @@ async function cariJurnal() {
   try {
     const res = await fetch('/cari?q=' + encodeURIComponent(q));
     const data = await res.json();
-    if (!data.hasil || data.hasil.length === 0) {
-      document.getElementById('hasil-cari').innerHTML = '<p>Tidak ada hasil.</p>';
-      return;
-    }
+    if (!data.hasil || data.hasil.length === 0) { document.getElementById('hasil-cari').innerHTML = '<p>Tidak ada hasil.</p>'; return; }
+    allData = [...allData, ...data.hasil];
     let html = `<p class="summary"><b>${data.hasil.length} hasil</b> untuk "<i>${q}</i>"</p>`;
-    data.hasil.forEach(item => { html += renderJurnalCard(item); });
+    html += `<div class="export-bar">Export: <button class="btn btn-export" onclick="exportData('ris')">📤 .RIS</button><button class="btn btn-export" onclick="exportData('csv')">📊 .CSV</button></div>`;
+    data.hasil.forEach((item,i) => { html += renderJurnalCard(item, i); });
     document.getElementById('hasil-cari').innerHTML = html;
-  } catch(e) {
-    document.getElementById('hasil-cari').innerHTML = `<p class="error">Error: ${e.message}</p>`;
-  } finally {
-    btn.disabled = false; btn.textContent = 'Cari';
-  }
+  } catch(e) { document.getElementById('hasil-cari').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
+  finally { btn.disabled = false; btn.textContent = 'Cari'; }
 }
 
 async function uploadFile() {
@@ -130,25 +200,19 @@ async function uploadFile() {
     for (let f of files) form.append('files', f);
     const res = await fetch('/upload', { method: 'POST', body: form });
     const data = await res.json();
-    if (data.error) {
-      document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${data.error}</p>`;
-      return;
-    }
+    if (data.error) { document.getElementById('hasil-upload').innerHTML = `<p class="error">${data.error}</p>`; return; }
     let html = '';
+    let newData = [];
     data.hasil.forEach(fr => {
       html += `<div class="file-header"><span>📄 ${fr.file}</span><span class="badge">${fr.total||0} jurnal</span></div>`;
-      if (fr.error) {
-        html += `<p class="error">${fr.error}</p>`;
-      } else {
-        fr.data.forEach(item => { html += renderJurnalCard(item); });
-      }
+      if (fr.error) { html += `<p class="error">${fr.error}</p>`; }
+      else { fr.data.forEach(item => { newData.push(item); html += renderJurnalCard(item); }); }
     });
+    allData = [...allData, ...newData];
+    html += `<div class="export-bar">Export: <button class="btn btn-export" onclick="exportData('ris')">📤 .RIS</button><button class="btn btn-export" onclick="exportData('csv')">📊 .CSV</button></div>`;
     document.getElementById('hasil-upload').innerHTML = html;
-  } catch(e) {
-    document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${e.message}</p>`;
-  } finally {
-    btn.disabled = false; btn.textContent = 'Upload & Parse';
-  }
+  } catch(e) { document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
+  finally { btn.disabled = false; btn.textContent = 'Upload & Parse'; }
 }
 </script>
 </body>
