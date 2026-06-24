@@ -133,3 +133,29 @@ async def upload_files(files: list[UploadFile] = File(...)):
         except Exception as e:
             semua_hasil.append({"file": file.filename, "error": str(e)})
     return {"total_file": len(semua_hasil), "hasil": semua_hasil}
+
+@app.get("/pdf")
+def cari_pdf(doi: str = None, judul: str = None):
+    try:
+        if doi:
+            # Unpaywall dulu
+            r = httpx.get(f"https://api.unpaywall.org/v2/{doi}?email=mesin@jurnal.app", timeout=10)
+            if r.status_code == 200:
+                data = r.json()
+                oa = data.get("best_oa_location")
+                if oa and oa.get("url_for_pdf"):
+                    return {"pdf_url": oa["url_for_pdf"], "source": "unpaywall"}
+        # Fallback ke Serper
+        q = judul or doi or ""
+        headers = {"X-API-KEY": SERPER_API_KEY, "Content-Type": "application/json"}
+        payload = {"q": q + " filetype:pdf", "gl": "id", "hl": "id"}
+        r = httpx.post("https://google.serper.dev/search", json=payload, headers=headers)
+        hasil = r.json().get("organic", [])
+        pdf_links = [h for h in hasil if ".pdf" in h.get("link","").lower()]
+        if pdf_links:
+            return {"pdf_url": pdf_links[0]["link"], "source": "serper"}
+        elif hasil:
+            return {"pdf_url": hasil[0]["link"], "source": "serper_page"}
+        return {"pdf_url": None, "source": None}
+    except Exception as e:
+        return {"error": str(e)}
