@@ -1,11 +1,5 @@
 {
-  "routes": [
-    { "src": "/cari", "dest": "/api/index" },
-    { "src": "/upload", "dest": "/api/index" },
-    { "src": "/docs", "dest": "/api/index" },
-    { "src": "/openapi.json", "dest": "/api/index" },
-    { "src": "/sw.js", "dest": "/sw.js" },
-    { "src": "/manifest.json", "dest": "/manifest.json" },
-    { "src": "/", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
   ]
 }
