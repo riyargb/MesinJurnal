@@ -1,9 +1,9 @@
 {
-  "rewrites": [
-    { "source": "/cari", "destination": "/api/index" },
-    { "source": "/upload", "destination": "/api/index" },
-    { "source": "/docs", "destination": "/api/index" },
-    { "source": "/openapi.json", "destination": "/api/index" },
-    { "source": "/(.*)", "destination": "/api/index" }
+  "routes": [
+    { "src": "/cari", "dest": "/api/index" },
+    { "src": "/upload", "dest": "/api/index" },
+    { "src": "/docs", "dest": "/api/index" },
+    { "src": "/openapi.json", "dest": "/api/index" },
+    { "src": "/", "dest": "/public/index.html" }
   ]
 }
