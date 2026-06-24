@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesin Jurnal</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: sans-serif; background: #f0f4f8; color: #333; }
+  .container { max-width: 860px; margin: 40px auto; padding: 20px; }
+  h1 { text-align: center; color: #2563eb; margin-bottom: 30px; font-size: 28px; }
+  .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  h2 { margin-bottom: 12px; color: #1e40af; }
+  label { font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #555; }
+  input[type=text] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+  input[type=file] { margin-top: 10px; width: 100%; border: 2px dashed #93c5fd; padding: 12px; border-radius: 8px; background: #eff6ff; cursor: pointer; }
+  button { margin-top: 12px; padding: 10px 24px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; }
+  button:hover { background: #1d4ed8; }
+  button:disabled { background: #93c5fd; cursor: not-allowed; }
+  .item { border-left: 4px solid #2563eb; padding: 10px 14px; margin-bottom: 10px; background: #f8faff; border-radius: 4px; }
+  .item a { color: #2563eb; text-decoration: none; font-weight: bold; font-size: 15px; }
+  .item a:hover { text-decoration: underline; }
+  .snippet { font-size: 13px; color: #555; margin-top: 4px; line-height: 1.5; }
+  .file-header { background: #dbeafe; padding: 8px 12px; border-radius: 6px; font-weight: bold; margin-bottom: 8px; margin-top: 14px; color: #1e40af; }
+  .loading { color: #2563eb; font-style: italic; margin-top: 10px; }
+  .error { color: red; margin-top: 10px; }
+  .badge { display: inline-block; background: #2563eb; color: white; border-radius: 99px; padding: 2px 10px; font-size: 12px; margin-left: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📚 Mesin Jurnal</h1>
+  <div class="card">
+    <h2>🔍 Cari Jurnal</h2>
+    <label>Kata kunci pencarian</label>
+    <input type="text" id="query" placeholder="contoh: peer support mental health..." onkeydown="if(event.key==='Enter') cariJurnal()">
+    <button onclick="cariJurnal()" id="btnCari">Cari</button>
+    <div id="hasil-cari"></div>
+  </div>
+  <div class="card">
+    <h2>📂 Upload File Referensi</h2>
+    <label>Format: .ris .pdf .txt .csv .xlsx .png .jpg (maks 4 file)</label>
+    <input type="file" id="fileInput" accept=".ris,.pdf,.txt,.csv,.xlsx,.png,.jpg,.jpeg" multiple>
+    <button onclick="uploadFile()" id="btnUpload">Upload & Parse</button>
+    <div id="hasil-upload"></div>
+  </div>
+</div>
+<script>
+async function cariJurnal() {
+  const q = document.getElementById('query').value.trim();
+  if (!q) return alert('Masukkan kata kunci!');
+  const btn = document.getElementById('btnCari');
+  btn.disabled = true; btn.textContent = 'Mencari...';
+  document.getElementById('hasil-cari').innerHTML = '<p class="loading">⏳ Sedang mencari...</p>';
+  try {
+    const res = await fetch('/cari?q=' + encodeURIComponent(q));
+    const data = await res.json();
+    if (!data.hasil || data.hasil.length === 0) { document.getElementById('hasil-cari').innerHTML = '<p>Tidak ada hasil.</p>'; return; }
+    let html = `<p style="margin-top:12px;margin-bottom:8px;color:#555"><b>${data.hasil.length} hasil</b> untuk "<i>${q}</i>"</p>`;
+    data.hasil.forEach(item => { html += `<div class="item"><a href="${item.link}" target="_blank">${item.judul}</a><div class="snippet">${item.snippet||''}</div></div>`; });
+    document.getElementById('hasil-cari').innerHTML = html;
+  } catch(e) { document.getElementById('hasil-cari').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
+  finally { btn.disabled = false; btn.textContent = 'Cari'; }
+}
+async function uploadFile() {
+  const files = document.getElementById('fileInput').files;
+  if (!files || files.length === 0) return alert('Pilih file dulu!');
+  if (files.length > 4) return alert('Maksimal 4 file!');
+  const btn = document.getElementById('btnUpload');
+  btn.disabled = true; btn.textContent = 'Memproses...';
+  document.getElementById('hasil-upload').innerHTML = '<p class="loading">⏳ Memproses file...</p>';
+  try {
+    const form = new FormData();
+    for (let f of files) form.append('files', f);
+    const res = await fetch('/upload', { method: 'POST', body: form });
+    const data = await res.json();
+    if (data.error) { document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${data.error}</p>`; return; }
+    let html = `<p style="margin-top:12px;margin-bottom:8px;color:#555"><b>${data.total_file} file</b> diproses</p>`;
+    data.hasil.forEach(fr => {
+      html += `<div class="file-header">📄 ${fr.file} <span class="badge">${fr.total||0} entri</span></div>`;
+      if (fr.error) { html += `<p class="error">${fr.error}</p>`; }
+      else { fr.data.forEach(item => { html += `<div class="item"><b>${item.judul||'(Judul tidak tersedia)'}</b>${item.tahun?`<span style="color:#888;font-size:13px"> · ${item.tahun}</span>`:''}<div class="snippet">${item.abstrak?item.abstrak.substring(0,300)+'...':''}</div></div>`; }); }
+    });
+    document.getElementById('hasil-upload').innerHTML = html;
+  } catch(e) { document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
+  finally { btn.disabled = false; btn.textContent = 'Upload & Parse'; }
+}
+</script>
+</body>
+</html>
