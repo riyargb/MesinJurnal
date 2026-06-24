@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mesin Jurnal</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2563eb">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: sans-serif; background: #f0f4f8; color: #333; }
@@ -17,23 +19,23 @@
   button { margin-top: 12px; padding: 10px 24px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; }
   button:hover { background: #1d4ed8; }
   button:disabled { background: #93c5fd; cursor: not-allowed; }
-  .item { border-left: 4px solid #2563eb; padding: 10px 14px; margin-bottom: 10px; background: #f8faff; border-radius: 4px; }
-  .item a { color: #2563eb; text-decoration: none; font-weight: bold; font-size: 15px; }
-  .item a:hover { text-decoration: underline; }
-  .snippet { font-size: 13px; color: #555; margin-top: 4px; line-height: 1.5; }
+  .item { border-left: 4px solid #2563eb; padding: 12px 14px; margin-bottom: 12px; background: #f8faff; border-radius: 4px; }
+  .item-title { font-weight: bold; font-size: 15px; color: #1e40af; margin-bottom: 4px; }
+  .item-title a { color: #1e40af; text-decoration: none; }
+  .item-title a:hover { text-decoration: underline; }
+  .item-meta { font-size: 13px; color: #666; margin-bottom: 6px; }
+  .item-abstract { font-size: 13px; color: #444; line-height: 1.6; background: #fff; padding: 8px; border-radius: 4px; margin-top: 6px; }
   .file-header { background: #dbeafe; padding: 8px 12px; border-radius: 6px; font-weight: bold; margin-bottom: 8px; margin-top: 14px; color: #1e40af; }
   .loading { color: #2563eb; font-style: italic; margin-top: 10px; }
   .error { color: red; margin-top: 10px; }
   .badge { display: inline-block; background: #2563eb; color: white; border-radius: 99px; padding: 2px 10px; font-size: 12px; margin-left: 8px; }
+  .tag { display: inline-block; background: #e0e7ff; color: #3730a3; border-radius: 4px; padding: 1px 8px; font-size: 12px; margin-right: 4px; }
 </style>
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#2563eb">
-<link rel="apple-touch-icon" href="/b36a945f5d77d01973338ed08078ff79.jpg">
-<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");</script>
 </head>
 <body>
 <div class="container">
   <h1>📚 Mesin Jurnal</h1>
+
   <div class="card">
     <h2>🔍 Cari Jurnal</h2>
     <label>Kata kunci pencarian</label>
@@ -41,6 +43,7 @@
     <button onclick="cariJurnal()" id="btnCari">Cari</button>
     <div id="hasil-cari"></div>
   </div>
+
   <div class="card">
     <h2>📂 Upload File Referensi</h2>
     <label>Format: .ris .pdf .txt .csv .xlsx .png .jpg (maks 4 file)</label>
@@ -49,23 +52,41 @@
     <div id="hasil-upload"></div>
   </div>
 </div>
+
 <script>
+if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
+
+function renderItem(item) {
+  const penulis = Array.isArray(item.penulis) ? item.penulis.join(", ") : item.penulis || "";
+  const tahun = item.tahun ? `<span class="tag">${item.tahun}</span>` : "";
+  const jurnal = item.jurnal ? `<span class="tag">📖 ${item.jurnal}</span>` : "";
+  const doi = item.doi ? `<span class="tag"><a href="https://doi.org/${item.doi}" target="_blank">DOI</a></span>` : "";
+  const abstrak = item.abstrak ? `<div class="item-abstract">📝 ${item.abstrak.substring(0,300)}${item.abstrak.length>300?'...':''}</div>` : "";
+  const penulisBadge = penulis ? `<span class="tag">👤 ${penulis.substring(0,60)}</span>` : "";
+  return `<div class="item">
+    <div class="item-title">${item.judul || item.link ? `<a href="${item.link||'#'}" target="_blank">${item.judul||'(Judul tidak tersedia)'}</a>` : '(Judul tidak tersedia)'}</div>
+    <div class="item-meta">${tahun}${jurnal}${penulisBadge}${doi}</div>
+    ${item.snippet ? `<div class="item-abstract">${item.snippet}</div>` : abstrak}
+  </div>`;
+}
+
 async function cariJurnal() {
   const q = document.getElementById('query').value.trim();
   if (!q) return alert('Masukkan kata kunci!');
   const btn = document.getElementById('btnCari');
   btn.disabled = true; btn.textContent = 'Mencari...';
-  document.getElementById('hasil-cari').innerHTML = '<p class="loading">⏳ Sedang mencari...</p>';
+  document.getElementById('hasil-cari').innerHTML = '<p class="loading">⏳ Sedang mencari jurnal...</p>';
   try {
     const res = await fetch('/cari?q=' + encodeURIComponent(q));
     const data = await res.json();
     if (!data.hasil || data.hasil.length === 0) { document.getElementById('hasil-cari').innerHTML = '<p>Tidak ada hasil.</p>'; return; }
     let html = `<p style="margin-top:12px;margin-bottom:8px;color:#555"><b>${data.hasil.length} hasil</b> untuk "<i>${q}</i>"</p>`;
-    data.hasil.forEach(item => { html += `<div class="item"><a href="${item.link}" target="_blank">${item.judul}</a><div class="snippet">${item.snippet||''}</div></div>`; });
+    data.hasil.forEach(item => { html += renderItem(item); });
     document.getElementById('hasil-cari').innerHTML = html;
   } catch(e) { document.getElementById('hasil-cari').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
   finally { btn.disabled = false; btn.textContent = 'Cari'; }
 }
+
 async function uploadFile() {
   const files = document.getElementById('fileInput').files;
   if (!files || files.length === 0) return alert('Pilih file dulu!');
@@ -83,7 +104,7 @@ async function uploadFile() {
     data.hasil.forEach(fr => {
       html += `<div class="file-header">📄 ${fr.file} <span class="badge">${fr.total||0} entri</span></div>`;
       if (fr.error) { html += `<p class="error">${fr.error}</p>`; }
-      else { fr.data.forEach(item => { html += `<div class="item"><b>${item.judul||'(Judul tidak tersedia)'}</b>${item.tahun?`<span style="color:#888;font-size:13px"> · ${item.tahun}</span>`:''}<div class="snippet">${item.abstrak?item.abstrak.substring(0,300)+'...':''}</div></div>`; }); }
+      else { fr.data.forEach(item => { html += renderItem(item); }); }
     });
     document.getElementById('hasil-upload').innerHTML = html;
   } catch(e) { document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
