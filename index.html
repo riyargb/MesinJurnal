@@ -19,17 +19,23 @@
   button { margin-top: 12px; padding: 10px 24px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; }
   button:hover { background: #1d4ed8; }
   button:disabled { background: #93c5fd; cursor: not-allowed; }
-  .item { border-left: 4px solid #2563eb; padding: 12px 14px; margin-bottom: 12px; background: #f8faff; border-radius: 4px; }
-  .item-title { font-weight: bold; font-size: 15px; color: #1e40af; margin-bottom: 4px; }
-  .item-title a { color: #1e40af; text-decoration: none; }
-  .item-title a:hover { text-decoration: underline; }
-  .item-meta { font-size: 13px; color: #666; margin-bottom: 6px; }
-  .item-abstract { font-size: 13px; color: #444; line-height: 1.6; background: #fff; padding: 8px; border-radius: 4px; margin-top: 6px; }
-  .file-header { background: #dbeafe; padding: 8px 12px; border-radius: 6px; font-weight: bold; margin-bottom: 8px; margin-top: 14px; color: #1e40af; }
+  .jurnal-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: box-shadow 0.2s; }
+  .jurnal-card:hover { box-shadow: 0 4px 12px rgba(37,99,235,0.12); }
+  .jurnal-title { font-size: 15px; font-weight: bold; color: #1e40af; margin-bottom: 8px; line-height: 1.4; }
+  .jurnal-title a { color: #1e40af; text-decoration: none; }
+  .jurnal-title a:hover { text-decoration: underline; }
+  .jurnal-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .tag { display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border-radius: 6px; padding: 3px 10px; font-size: 12px; border: 1px solid #bfdbfe; }
+  .tag-doi { background: #f0fdf4; color: #166534; border-color: #bbf7d0; cursor: pointer; }
+  .tag-doi a { color: #166534; text-decoration: none; }
+  .jurnal-abstract { font-size: 13px; color: #555; line-height: 1.6; background: #f8faff; padding: 10px; border-radius: 6px; border-left: 3px solid #93c5fd; margin-top: 8px; display: none; }
+  .jurnal-abstract.show { display: block; }
+  .toggle-abstract { font-size: 12px; color: #2563eb; cursor: pointer; background: none; border: none; padding: 4px 0; margin-top: 4px; font-weight: bold; }
+  .file-header { background: #dbeafe; padding: 8px 12px; border-radius: 6px; font-weight: bold; margin-bottom: 10px; margin-top: 16px; color: #1e40af; display: flex; align-items: center; justify-content: space-between; }
+  .badge { background: #2563eb; color: white; border-radius: 99px; padding: 2px 10px; font-size: 12px; }
   .loading { color: #2563eb; font-style: italic; margin-top: 10px; }
   .error { color: red; margin-top: 10px; }
-  .badge { display: inline-block; background: #2563eb; color: white; border-radius: 99px; padding: 2px 10px; font-size: 12px; margin-left: 8px; }
-  .tag { display: inline-block; background: #e0e7ff; color: #3730a3; border-radius: 4px; padding: 1px 8px; font-size: 12px; margin-right: 4px; }
+  .summary { color: #555; margin: 10px 0; font-size: 14px; }
 </style>
 </head>
 <body>
@@ -56,18 +62,37 @@
 <script>
 if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 
-function renderItem(item) {
-  const penulis = Array.isArray(item.penulis) ? item.penulis.join(", ") : item.penulis || "";
-  const tahun = item.tahun ? `<span class="tag">${item.tahun}</span>` : "";
-  const jurnal = item.jurnal ? `<span class="tag">📖 ${item.jurnal}</span>` : "";
-  const doi = item.doi ? `<span class="tag"><a href="https://doi.org/${item.doi}" target="_blank">DOI</a></span>` : "";
-  const abstrak = item.abstrak ? `<div class="item-abstract">📝 ${item.abstrak.substring(0,300)}${item.abstrak.length>300?'...':''}</div>` : "";
-  const penulisBadge = penulis ? `<span class="tag">👤 ${penulis.substring(0,60)}</span>` : "";
-  return `<div class="item">
-    <div class="item-title">${item.judul || item.link ? `<a href="${item.link||'#'}" target="_blank">${item.judul||'(Judul tidak tersedia)'}</a>` : '(Judul tidak tersedia)'}</div>
-    <div class="item-meta">${tahun}${jurnal}${penulisBadge}${doi}</div>
-    ${item.snippet ? `<div class="item-abstract">${item.snippet}</div>` : abstrak}
+let abstractCounter = 0;
+
+function renderJurnalCard(item) {
+  const id = 'abs-' + (abstractCounter++);
+  const penulis = Array.isArray(item.penulis) ? item.penulis.join(", ") : (item.penulis || "");
+  const judul = item.judul || item.title || "(Judul tidak tersedia)";
+  const link = item.link ? `<a href="${item.link}" target="_blank">${judul}</a>` : judul;
+
+  let meta = '';
+  if (item.tahun) meta += `<span class="tag">📅 ${item.tahun}</span>`;
+  if (item.jurnal) meta += `<span class="tag">📖 ${item.jurnal}</span>`;
+  if (penulis) meta += `<span class="tag">👤 ${penulis.length > 80 ? penulis.substring(0,80)+'...' : penulis}</span>`;
+  if (item.doi) meta += `<span class="tag tag-doi"><a href="https://doi.org/${item.doi}" target="_blank">🔗 DOI: ${item.doi}</a></span>`;
+
+  const abstrak = item.abstrak || item.snippet || "";
+  const absBlock = abstrak ? `
+    <button class="toggle-abstract" onclick="toggleAbs('${id}')">▼ Lihat Abstrak</button>
+    <div class="jurnal-abstract" id="${id}">${abstrak}</div>` : '';
+
+  return `<div class="jurnal-card">
+    <div class="jurnal-title">${link}</div>
+    <div class="jurnal-meta">${meta}</div>
+    ${absBlock}
   </div>`;
+}
+
+function toggleAbs(id) {
+  const el = document.getElementById(id);
+  const btn = el.previousElementSibling;
+  el.classList.toggle('show');
+  btn.textContent = el.classList.contains('show') ? '▲ Sembunyikan Abstrak' : '▼ Lihat Abstrak';
 }
 
 async function cariJurnal() {
@@ -79,12 +104,18 @@ async function cariJurnal() {
   try {
     const res = await fetch('/cari?q=' + encodeURIComponent(q));
     const data = await res.json();
-    if (!data.hasil || data.hasil.length === 0) { document.getElementById('hasil-cari').innerHTML = '<p>Tidak ada hasil.</p>'; return; }
-    let html = `<p style="margin-top:12px;margin-bottom:8px;color:#555"><b>${data.hasil.length} hasil</b> untuk "<i>${q}</i>"</p>`;
-    data.hasil.forEach(item => { html += renderItem(item); });
+    if (!data.hasil || data.hasil.length === 0) {
+      document.getElementById('hasil-cari').innerHTML = '<p>Tidak ada hasil.</p>';
+      return;
+    }
+    let html = `<p class="summary"><b>${data.hasil.length} hasil</b> untuk "<i>${q}</i>"</p>`;
+    data.hasil.forEach(item => { html += renderJurnalCard(item); });
     document.getElementById('hasil-cari').innerHTML = html;
-  } catch(e) { document.getElementById('hasil-cari').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
-  finally { btn.disabled = false; btn.textContent = 'Cari'; }
+  } catch(e) {
+    document.getElementById('hasil-cari').innerHTML = `<p class="error">Error: ${e.message}</p>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Cari';
+  }
 }
 
 async function uploadFile() {
@@ -99,16 +130,25 @@ async function uploadFile() {
     for (let f of files) form.append('files', f);
     const res = await fetch('/upload', { method: 'POST', body: form });
     const data = await res.json();
-    if (data.error) { document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${data.error}</p>`; return; }
-    let html = `<p style="margin-top:12px;margin-bottom:8px;color:#555"><b>${data.total_file} file</b> diproses</p>`;
+    if (data.error) {
+      document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${data.error}</p>`;
+      return;
+    }
+    let html = '';
     data.hasil.forEach(fr => {
-      html += `<div class="file-header">📄 ${fr.file} <span class="badge">${fr.total||0} entri</span></div>`;
-      if (fr.error) { html += `<p class="error">${fr.error}</p>`; }
-      else { fr.data.forEach(item => { html += renderItem(item); }); }
+      html += `<div class="file-header"><span>📄 ${fr.file}</span><span class="badge">${fr.total||0} jurnal</span></div>`;
+      if (fr.error) {
+        html += `<p class="error">${fr.error}</p>`;
+      } else {
+        fr.data.forEach(item => { html += renderJurnalCard(item); });
+      }
     });
     document.getElementById('hasil-upload').innerHTML = html;
-  } catch(e) { document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
-  finally { btn.disabled = false; btn.textContent = 'Upload & Parse'; }
+  } catch(e) {
+    document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${e.message}</p>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Upload & Parse';
+  }
 }
 </script>
 </body>
