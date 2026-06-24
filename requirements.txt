@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-supabase==2.4.1
-gotrue==2.3.0
-httpx==0.25.2
+supabase
 requests
+httpx
