@@ -11,71 +11,91 @@
 <link rel="apple-touch-icon" href="/b36a945f5d77d01973338ed08078ff79.jpg">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: sans-serif; background: #f0f4f8; color: #333; }
-  .container { max-width: 860px; margin: 40px auto; padding: 20px; }
-  h1 { text-align: center; color: #2563eb; margin-bottom: 30px; font-size: 28px; }
-  .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-  h2 { margin-bottom: 12px; color: #1e40af; }
-  label { font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #555; }
-  input[type=text] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-  input[type=file] { margin-top: 10px; width: 100%; border: 2px dashed #93c5fd; padding: 12px; border-radius: 8px; background: #eff6ff; cursor: pointer; }
-  .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; }
-  .btn-primary { background: #2563eb; color: white; margin-top: 12px; padding: 10px 24px; font-size: 15px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #1a1a2e; font-size: 14px; }
+  .container { max-width: 860px; margin: 32px auto; padding: 0 16px 40px; }
+  h1 { text-align: center; color: #1e3a8a; margin-bottom: 28px; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .section { background: white; border-radius: 10px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e8ecf0; }
+  .section-title { font-size: 14px; font-weight: 700; color: #1e3a8a; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+  input[type=text] { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 7px; font-size: 14px; outline: none; transition: border 0.2s; }
+  input[type=text]:focus { border-color: #2563eb; }
+  input[type=file] { width: 100%; border: 1.5px dashed #cbd5e1; padding: 12px; border-radius: 7px; background: #f8fafc; cursor: pointer; font-size: 13px; color: #64748b; margin-top: 8px; }
+  .btn { padding: 8px 16px; border: none; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; }
+  .btn-primary { background: #2563eb; color: white; margin-top: 10px; width: 100%; padding: 11px; font-size: 14px; }
   .btn-primary:hover { background: #1d4ed8; }
   .btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
-  .btn-sm { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; margin-right: 6px; margin-top: 6px; }
-  .btn-sm:hover { background: #dbeafe; }
-  .btn-green { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-  .btn-green:hover { background: #dcfce7; }
-  .btn-export { background: #faf5ff; color: #6b21a8; border: 1px solid #e9d5ff; }
-  .btn-export:hover { background: #f3e8ff; }
-  .jurnal-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-  .jurnal-title { font-size: 15px; font-weight: bold; color: #1e40af; margin-bottom: 8px; line-height: 1.4; }
-  .jurnal-title a { color: #1e40af; text-decoration: none; }
+  .btn-outline { background: white; color: #374151; border: 1px solid #d1d5db; }
+  .btn-outline:hover { background: #f9fafb; }
+  .btn-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .btn-blue:hover { background: #dbeafe; }
+  .btn-export { background: white; color: #6b21a8; border: 1px solid #e9d5ff; }
+  .btn-export:hover { background: #faf5ff; }
+  .toolbar { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; align-items: center; }
+  .toolbar-label { font-size: 12px; color: #6b7280; font-weight: 600; }
+  .jurnal-card { border: 1px solid #e8ecf0; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; background: white; }
+  .jurnal-title { font-size: 14px; font-weight: 600; color: #1e3a8a; margin-bottom: 6px; line-height: 1.45; }
+  .jurnal-title a { color: #1e3a8a; text-decoration: none; }
   .jurnal-title a:hover { text-decoration: underline; }
-  .jurnal-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-  .tag { display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border-radius: 6px; padding: 3px 10px; font-size: 12px; border: 1px solid #bfdbfe; }
-  .jurnal-abstract { font-size: 13px; color: #555; line-height: 1.6; background: #f8faff; padding: 10px; border-radius: 6px; border-left: 3px solid #93c5fd; margin-top: 8px; display: none; }
-  .jurnal-abstract.show { display: block; }
-  .jurnal-actions { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
-  .file-header { background: #dbeafe; padding: 8px 12px; border-radius: 6px; font-weight: bold; margin-bottom: 10px; margin-top: 16px; color: #1e40af; display: flex; align-items: center; justify-content: space-between; }
-  .badge { background: #2563eb; color: white; border-radius: 99px; padding: 2px 10px; font-size: 12px; }
-  .export-bar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
-  .loading { color: #2563eb; font-style: italic; margin-top: 10px; }
-  .error { color: red; margin-top: 10px; }
-  .summary { color: #555; margin: 10px 0; font-size: 14px; }
-  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; }
+  .jurnal-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .tag { font-size: 11px; background: #f1f5f9; color: #475569; border-radius: 5px; padding: 2px 8px; border: 1px solid #e2e8f0; }
+  .jurnal-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .abstract-box { font-size: 13px; color: #4b5563; line-height: 1.6; background: #f8fafc; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #93c5fd; margin-top: 8px; display: none; }
+  .abstract-box.show { display: block; }
+  .pdf-results { margin-top: 8px; display: none; }
+  .pdf-results.show { display: block; }
+  .pdf-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; background: #f8fafc; border-radius: 6px; margin-bottom: 6px; border: 1px solid #e8ecf0; }
+  .pdf-item-icon { color: #dc2626; font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .pdf-item-info { flex: 1; min-width: 0; }
+  .pdf-item-title { font-size: 12px; font-weight: 600; color: #1e40af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pdf-item-title a { color: #1e40af; text-decoration: none; }
+  .pdf-item-title a:hover { text-decoration: underline; }
+  .pdf-item-src { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .file-header { background: #f1f5f9; padding: 8px 12px; border-radius: 6px; font-weight: 700; margin-bottom: 10px; margin-top: 14px; color: #1e3a8a; font-size: 13px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; }
+  .badge { background: #2563eb; color: white; border-radius: 99px; padding: 2px 9px; font-size: 11px; }
+  .summary { color: #6b7280; margin: 10px 0 4px; font-size: 13px; }
+  .loading { color: #2563eb; font-style: italic; margin-top: 10px; font-size: 13px; }
+  .error { color: #dc2626; margin-top: 10px; font-size: 13px; }
+  .divider { border: none; border-top: 1px solid #e8ecf0; margin: 12px 0; }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; justify-content: center; align-items: center; }
   .modal.show { display: flex; }
-  .modal-box { background: white; border-radius: 12px; padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
-  .modal-title { font-size: 16px; font-weight: bold; color: #1e40af; margin-bottom: 12px; }
-  .modal-close { float: right; cursor: pointer; font-size: 20px; color: #999; }
+  .modal-box { background: white; border-radius: 10px; padding: 22px; max-width: 600px; width: 92%; max-height: 82vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .modal-title { font-size: 15px; font-weight: 700; color: #1e3a8a; line-height: 1.4; flex: 1; padding-right: 12px; }
+  .modal-close { cursor: pointer; font-size: 18px; color: #9ca3af; flex-shrink: 0; }
+  .modal-close:hover { color: #374151; }
+  .modal-row { margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
+  .modal-label { font-weight: 700; color: #374151; display: block; margin-bottom: 2px; }
+  .modal-abstract { background: #f8fafc; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #93c5fd; font-size: 13px; line-height: 1.6; color: #4b5563; }
+  .btn-scan-all { background: #1e3a8a; color: white; border: none; }
+  .btn-scan-all:hover { background: #1e40af; }
+  .scan-progress { font-size: 12px; color: #6b7280; margin-top: 4px; }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>📚 Mesin Jurnal</h1>
+  <h1>Mesin Jurnal</h1>
 
-  <div class="card">
-    <h2>🔍 Cari Jurnal</h2>
-    <label>Kata kunci pencarian</label>
-    <input type="text" id="query" placeholder="contoh: peer support mental health..." onkeydown="if(event.key==='Enter') cariJurnal()">
-    <button class="btn btn-primary" onclick="cariJurnal()" id="btnCari">Cari</button>
+  <div class="section">
+    <div class="section-title">Search</div>
+    <input type="text" id="query" placeholder="Kata kunci pencarian jurnal..." onkeydown="if(event.key==='Enter') cariJurnal()">
+    <button class="btn btn-primary" onclick="cariJurnal()" id="btnCari">Cari Jurnal</button>
     <div id="hasil-cari"></div>
   </div>
 
-  <div class="card">
-    <h2>📂 Upload File Referensi</h2>
-    <label>Format: .ris .pdf .txt .csv .xlsx .png .jpg (maks 4 file)</label>
+  <div class="section">
+    <div class="section-title">Upload Referensi</div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:4px">Format: .ris .pdf .txt .csv .xlsx .png .jpg — Maks. 4 file</div>
     <input type="file" id="fileInput" accept=".ris,.pdf,.txt,.csv,.xlsx,.png,.jpg,.jpeg" multiple>
-    <button class="btn btn-primary" onclick="uploadFile()" id="btnUpload">Upload & Parse</button>
+    <button class="btn btn-primary" onclick="uploadFile()" id="btnUpload">Proses File</button>
     <div id="hasil-upload"></div>
   </div>
 </div>
 
 <div class="modal" id="modal">
   <div class="modal-box">
-    <span class="modal-close" onclick="closeModal()">✕</span>
-    <div class="modal-title" id="modal-title">Detail Jurnal</div>
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Detail</div>
+      <span class="modal-close" onclick="closeModal()">x</span>
+    </div>
     <div id="modal-body"></div>
   </div>
 </div>
@@ -85,39 +105,87 @@ if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 
 let allData = [];
 let absCounter = 0;
+let currentCards = [];
 
 function closeModal() { document.getElementById('modal').classList.remove('show'); }
 
 function renderJurnalCard(item, idx) {
-  const id = 'abs-' + (absCounter++);
+  const id = 'c' + (absCounter++);
   const penulis = Array.isArray(item.penulis) ? item.penulis.join(", ") : (item.penulis || "");
   const judul = item.judul || item.title || "(Judul tidak tersedia)";
   const titleHtml = item.link ? `<a href="${item.link}" target="_blank">${judul}</a>` : judul;
   let meta = '';
-  if (item.tahun) meta += `<span class="tag">📅 ${item.tahun}</span>`;
-  if (item.jurnal) meta += `<span class="tag">📖 ${item.jurnal.length>40?item.jurnal.substring(0,40)+'...':item.jurnal}</span>`;
-  if (penulis) meta += `<span class="tag">👤 ${penulis.length>60?penulis.substring(0,60)+'...':penulis}</span>`;
+  if (item.tahun) meta += `<span class="tag">${item.tahun}</span>`;
+  if (item.jurnal) meta += `<span class="tag">${item.jurnal.length>45?item.jurnal.substring(0,45)+'...':item.jurnal}</span>`;
+  if (penulis) meta += `<span class="tag">${penulis.length>55?penulis.substring(0,55)+'...':penulis}</span>`;
   const abstrak = item.abstrak || item.snippet || "";
-  const absBlock = abstrak ? `<button class="btn btn-sm" onclick="toggleAbs('${id}')">▼ Abstrak</button><div class="jurnal-abstract" id="${id}">${abstrak}</div>` : '';
-  const doiBtn = item.doi ? `<button class="btn btn-sm" onclick="fetchDOI('${item.doi}')">🔗 Detail DOI</button>` : '';
-  const pdfBtn = `<button class="btn btn-sm btn-green" onclick="cariPDF('${item.doi||''}','${judul.replace(/'/g,"\\'")}')">📄 Cari PDF</button>`;
-  return `<div class="jurnal-card">
+  const absBtn = abstrak ? `<button class="btn btn-outline" onclick="toggleAbs('${id}-abs')">Abstrak</button>` : '';
+  const absBox = abstrak ? `<div class="abstract-box" id="${id}-abs">${abstrak}</div>` : '';
+  const doiBtn = item.doi ? `<button class="btn btn-blue" onclick="fetchDOI('${item.doi}')">Detail DOI</button>` : '';
+  return `<div class="jurnal-card" id="${id}">
     <div class="jurnal-title">${titleHtml}</div>
-    <div class="jurnal-meta">${meta}</div>
-    <div class="jurnal-actions">${absBlock}${doiBtn}${pdfBtn}</div>
+    ${meta ? `<div class="jurnal-meta">${meta}</div>` : ''}
+    <div class="jurnal-actions">${absBtn}${doiBtn}<button class="btn btn-outline" onclick="cariPDFSingle('${item.doi||''}','${judul.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${id}')">Cari PDF</button></div>
+    ${absBox}
+    <div class="pdf-results" id="${id}-pdf"></div>
   </div>`;
 }
 
 function toggleAbs(id) {
   const el = document.getElementById(id);
-  const btn = el.previousElementSibling;
   el.classList.toggle('show');
-  btn.textContent = el.classList.contains('show') ? '▲ Abstrak' : '▼ Abstrak';
+}
+
+async function cariPDFSingle(doi, judul, cardId) {
+  const box = document.getElementById(cardId + '-pdf');
+  box.innerHTML = '<p class="loading">Mencari PDF...</p>';
+  box.classList.add('show');
+  const result = await fetchPDF(doi, judul);
+  box.innerHTML = renderPDFResults(result);
+}
+
+async function fetchPDF(doi, judul) {
+  try {
+    const params = new URLSearchParams();
+    if (doi) params.append('doi', doi);
+    if (judul) params.append('judul', judul);
+    const res = await fetch('/pdf?' + params.toString());
+    return await res.json();
+  } catch(e) { return { error: e.message }; }
+}
+
+function renderPDFResults(d) {
+  if (d.error) return `<p class="error">${d.error}</p>`;
+  if (!d.pdf_url) return `<p style="font-size:12px;color:#6b7280;padding:6px 0">PDF tidak tersedia secara open access.</p>`;
+  return `<div class="pdf-item">
+    <div class="pdf-item-icon">[PDF]</div>
+    <div class="pdf-item-info">
+      <div class="pdf-item-title"><a href="${d.pdf_url}" target="_blank">${d.pdf_url.length>70?d.pdf_url.substring(0,70)+'...':d.pdf_url}</a></div>
+      <div class="pdf-item-src">via ${d.source}</div>
+    </div>
+  </div>`;
+}
+
+async function scanAllPDF(cards, containerId) {
+  const progressEl = document.getElementById(containerId + '-progress');
+  for (let i = 0; i < cards.length; i++) {
+    if (progressEl) progressEl.textContent = `Memindai PDF: ${i+1}/${cards.length}`;
+    const { id, doi, judul } = cards[i];
+    const box = document.getElementById(id + '-pdf');
+    if (box) {
+      box.innerHTML = '<p class="loading">Mencari...</p>';
+      box.classList.add('show');
+      const result = await fetchPDF(doi, judul);
+      box.innerHTML = renderPDFResults(result);
+    }
+    await new Promise(r => setTimeout(r, 300));
+  }
+  if (progressEl) progressEl.textContent = 'Selesai.';
 }
 
 async function fetchDOI(doi) {
-  document.getElementById('modal-title').textContent = 'Memuat detail...';
-  document.getElementById('modal-body').innerHTML = '<p class="loading">⏳ Mengambil data dari CrossRef...</p>';
+  document.getElementById('modal-title').textContent = 'Memuat...';
+  document.getElementById('modal-body').innerHTML = '<p class="loading">Mengambil data dari CrossRef...</p>';
   document.getElementById('modal').classList.add('show');
   try {
     const res = await fetch('/doi?doi=' + encodeURIComponent(doi));
@@ -126,75 +194,75 @@ async function fetchDOI(doi) {
     const penulis = Array.isArray(d.penulis) ? d.penulis.join(", ") : d.penulis;
     document.getElementById('modal-title').textContent = d.judul || 'Detail Jurnal';
     document.getElementById('modal-body').innerHTML = `
-      <p><b>Penulis:</b> ${penulis||'-'}</p><br>
-      <p><b>Tahun:</b> ${d.tahun||'-'}</p><br>
-      <p><b>Jurnal:</b> ${d.jurnal||'-'}</p><br>
-      <p><b>DOI:</b> <a href="https://doi.org/${doi}" target="_blank">${doi}</a></p><br>
-      ${d.abstrak ? `<p><b>Abstrak:</b></p><br><p style="font-size:13px;line-height:1.6;background:#f8faff;padding:10px;border-radius:6px">${d.abstrak}</p>` : ''}
+      <div class="modal-row"><span class="modal-label">Penulis</span>${penulis||'-'}</div>
+      <div class="modal-row"><span class="modal-label">Tahun</span>${d.tahun||'-'}</div>
+      <div class="modal-row"><span class="modal-label">Jurnal</span>${d.jurnal||'-'}</div>
+      <div class="modal-row"><span class="modal-label">DOI</span><a href="https://doi.org/${doi}" target="_blank">${doi}</a></div>
+      <hr class="divider">
+      ${d.abstrak ? `<div class="modal-label">Abstrak</div><div class="modal-abstract" style="margin-top:6px">${d.abstrak}</div>` : '<p style="color:#6b7280;font-size:13px">Abstrak tidak tersedia.</p>'}
     `;
   } catch(e) { document.getElementById('modal-body').innerHTML = `<p class="error">${e.message}</p>`; }
 }
 
-async function cariPDF(doi, judul) {
-  document.getElementById('modal-title').textContent = 'Mencari PDF...';
-  document.getElementById('modal-body').innerHTML = '<p class="loading">⏳ Mencari PDF open access...</p>';
-  document.getElementById('modal').classList.add('show');
-  try {
-    const params = new URLSearchParams();
-    if (doi) params.append('doi', doi);
-    if (judul) params.append('judul', judul);
-    const res = await fetch('/pdf?' + params.toString());
-    const d = await res.json();
-    if (d.pdf_url) {
-      document.getElementById('modal-body').innerHTML = `
-        <p>✅ PDF ditemukan via <b>${d.source}</b></p><br>
-        <a href="${d.pdf_url}" target="_blank" class="btn btn-primary" style="display:inline-block;text-decoration:none">📥 Buka PDF</a>
-      `;
-    } else {
-      document.getElementById('modal-body').innerHTML = '<p>❌ PDF tidak ditemukan secara gratis.</p>';
-    }
-  } catch(e) { document.getElementById('modal-body').innerHTML = `<p class="error">${e.message}</p>`; }
-}
-
 function exportData(format) {
-  if (allData.length === 0) return alert('Tidak ada data untuk diekspor!');
+  if (allData.length === 0) return alert('Tidak ada data untuk diekspor.');
   fetch('/export/' + format, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(allData)
   }).then(r => r.blob()).then(blob => {
-    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'export.' + format; a.click();
+    a.href = URL.createObjectURL(blob);
+    a.download = 'export.' + format;
+    a.click();
   });
 }
 
 async function cariJurnal() {
   const q = document.getElementById('query').value.trim();
-  if (!q) return alert('Masukkan kata kunci!');
+  if (!q) return alert('Masukkan kata kunci.');
   const btn = document.getElementById('btnCari');
   btn.disabled = true; btn.textContent = 'Mencari...';
-  document.getElementById('hasil-cari').innerHTML = '<p class="loading">⏳ Sedang mencari jurnal...</p>';
+  document.getElementById('hasil-cari').innerHTML = '<p class="loading">Mencari jurnal...</p>';
   try {
     const res = await fetch('/cari?q=' + encodeURIComponent(q));
     const data = await res.json();
     if (!data.hasil || data.hasil.length === 0) { document.getElementById('hasil-cari').innerHTML = '<p>Tidak ada hasil.</p>'; return; }
     allData = [...allData, ...data.hasil];
-    let html = `<p class="summary"><b>${data.hasil.length} hasil</b> untuk "<i>${q}</i>"</p>`;
-    html += `<div class="export-bar">Export: <button class="btn btn-export" onclick="exportData('ris')">📤 .RIS</button><button class="btn btn-export" onclick="exportData('csv')">📊 .CSV</button></div>`;
-    data.hasil.forEach((item,i) => { html += renderJurnalCard(item, i); });
+    const containerId = 'cari-' + Date.now();
+    const cards = data.hasil.map((item, i) => {
+      const id = 'c' + (absCounter);
+      absCounter++;
+      return { id, doi: item.doi||'', judul: item.judul||item.title||'' };
+    });
+    absCounter -= data.hasil.length;
+    let html = `<p class="summary">${data.hasil.length} hasil untuk "${q}"</p>`;
+    html += `<div class="toolbar">
+      <span class="toolbar-label">Export:</span>
+      <button class="btn btn-export" onclick="exportData('ris')">.RIS</button>
+      <button class="btn btn-export" onclick="exportData('csv')">.CSV</button>
+      <button class="btn btn-scan-all" onclick="scanAllPDF(cariCards,'${containerId}')">Cari Semua PDF</button>
+    </div>
+    <div class="scan-progress" id="${containerId}-progress"></div>`;
+    const cariCards = [];
+    data.hasil.forEach((item) => {
+      const id = 'c' + absCounter;
+      cariCards.push({ id, doi: item.doi||'', judul: item.judul||item.title||'' });
+      html += renderJurnalCard(item);
+    });
     document.getElementById('hasil-cari').innerHTML = html;
-  } catch(e) { document.getElementById('hasil-cari').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
-  finally { btn.disabled = false; btn.textContent = 'Cari'; }
+    window.cariCards = cariCards;
+  } catch(e) { document.getElementById('hasil-cari').innerHTML = `<p class="error">${e.message}</p>`; }
+  finally { btn.disabled = false; btn.textContent = 'Cari Jurnal'; }
 }
 
 async function uploadFile() {
   const files = document.getElementById('fileInput').files;
-  if (!files || files.length === 0) return alert('Pilih file dulu!');
-  if (files.length > 4) return alert('Maksimal 4 file!');
+  if (!files || files.length === 0) return alert('Pilih file terlebih dahulu.');
+  if (files.length > 4) return alert('Maksimal 4 file.');
   const btn = document.getElementById('btnUpload');
   btn.disabled = true; btn.textContent = 'Memproses...';
-  document.getElementById('hasil-upload').innerHTML = '<p class="loading">⏳ Memproses file...</p>';
+  document.getElementById('hasil-upload').innerHTML = '<p class="loading">Memproses file...</p>';
   try {
     const form = new FormData();
     for (let f of files) form.append('files', f);
@@ -202,17 +270,31 @@ async function uploadFile() {
     const data = await res.json();
     if (data.error) { document.getElementById('hasil-upload').innerHTML = `<p class="error">${data.error}</p>`; return; }
     let html = '';
-    let newData = [];
+    const uploadCards = [];
+    const containerId = 'upload-' + Date.now();
     data.hasil.forEach(fr => {
-      html += `<div class="file-header"><span>📄 ${fr.file}</span><span class="badge">${fr.total||0} jurnal</span></div>`;
+      html += `<div class="file-header"><span>${fr.file}</span><span class="badge">${fr.total||0} jurnal</span></div>`;
       if (fr.error) { html += `<p class="error">${fr.error}</p>`; }
-      else { fr.data.forEach(item => { newData.push(item); html += renderJurnalCard(item); }); }
+      else {
+        fr.data.forEach(item => {
+          allData.push(item);
+          const id = 'c' + absCounter;
+          uploadCards.push({ id, doi: item.doi||'', judul: item.judul||'' });
+          html += renderJurnalCard(item);
+        });
+      }
     });
-    allData = [...allData, ...newData];
-    html += `<div class="export-bar">Export: <button class="btn btn-export" onclick="exportData('ris')">📤 .RIS</button><button class="btn btn-export" onclick="exportData('csv')">📊 .CSV</button></div>`;
+    html += `<hr class="divider"><div class="toolbar">
+      <span class="toolbar-label">Export:</span>
+      <button class="btn btn-export" onclick="exportData('ris')">.RIS</button>
+      <button class="btn btn-export" onclick="exportData('csv')">.CSV</button>
+      <button class="btn btn-scan-all" onclick="scanAllPDF(uploadCards,'${containerId}')">Cari Semua PDF</button>
+    </div>
+    <div class="scan-progress" id="${containerId}-progress"></div>`;
     document.getElementById('hasil-upload').innerHTML = html;
-  } catch(e) { document.getElementById('hasil-upload').innerHTML = `<p class="error">Error: ${e.message}</p>`; }
-  finally { btn.disabled = false; btn.textContent = 'Upload & Parse'; }
+    window.uploadCards = uploadCards;
+  } catch(e) { document.getElementById('hasil-upload').innerHTML = `<p class="error">${e.message}</p>`; }
+  finally { btn.disabled = false; btn.textContent = 'Proses File'; }
 }
 </script>
 </body>
