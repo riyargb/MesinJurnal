@@ -188,3 +188,21 @@ async def upload_files(files: list[UploadFile] = File(...)):
         except Exception as e:
             semua_hasil.append({"file": file.filename, "error": str(e)})
     return {"total_file": len(semua_hasil), "hasil": semua_hasil}
+
+from fastapi.responses import FileResponse
+import pathlib
+
+@app.get("/icon.jpg")
+def serve_icon():
+    p = pathlib.Path(__file__).parent.parent / "icon.jpg"
+    return FileResponse(p, media_type="image/jpeg")
+
+@app.get("/manifest.json")
+def serve_manifest():
+    p = pathlib.Path(__file__).parent.parent / "manifest.json"
+    return FileResponse(p, media_type="application/json")
+
+@app.get("/sw.js")
+def serve_sw():
+    p = pathlib.Path(__file__).parent.parent / "sw.js"
+    return FileResponse(p, media_type="application/javascript")
