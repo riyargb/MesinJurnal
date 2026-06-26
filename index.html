@@ -102,6 +102,39 @@
   .about-tags { display: flex; flex-wrap: wrap; gap: 5px; }
   .about-tag { font-size: 11px; background: #eff6ff; color: #1d4ed8; border-radius: 5px; padding: 3px 9px; border: 1px solid #bfdbfe; }
   .about-footer { text-align: center; margin-top: 20px; padding-top: 14px; border-top: 1px solid #e8ecf0; font-size: 12px; color: #9ca3af; }
+
+  /* ABOUT MODAL STYLES */
+  .about-profile { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #2a2a3e; }
+  .about-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; object-position: center 30%; border: 2px solid #c9a96e; box-shadow: 0 0 16px rgba(201,169,110,0.3); flex-shrink: 0; }
+  .about-name-anim { font-size: 20px; font-weight: 800; margin-bottom: 4px; background: linear-gradient(90deg,#c9a96e,#e8c99a,#1a7abf,#c0392b,#c9a96e); background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: nameColor 6s ease infinite; }
+  @keyframes nameColor { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .about-role { font-size: 11px; color: #94a3b8; line-height: 1.5; margin-bottom: 8px; }
+  .social-tiktok { font-size: 11px; padding: 4px 10px; border-radius: 20px; text-decoration: none; font-weight: 600; background: linear-gradient(90deg,#69C9D0,#EE1D52,#69C9D0); background-size: 200% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: tiktokColor 4s ease infinite; border: 1px solid #EE1D52; }
+  @keyframes tiktokColor { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .social-linkedin { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: #1e293b; border: 1px solid #0077b5; color: #0077b5; text-decoration: none; font-weight: 600; animation: linkedinPulse 2s ease-in-out infinite; }
+  @keyframes linkedinPulse { 0%,100%{transform:scale(1);box-shadow:0 0 0 rgba(0,119,181,0)} 50%{transform:scale(1.06);box-shadow:0 0 10px rgba(0,119,181,0.5)} }
+  .about-bio { font-size: 13px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #2a2a3e; min-height: 52px; }
+  .about-cursor { animation: blink 0.8s infinite; color: #c9a96e; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .about-section { margin-bottom: 18px; }
+  .about-section-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #c9a96e; animation: headerGlow 3s ease-in-out infinite; }
+  @keyframes headerGlow { 0%,100%{text-shadow:0 0 0px rgba(201,169,110,0)} 50%{text-shadow:0 0 8px rgba(201,169,110,0.6)} }
+  .about-item { font-size: 12px; color: #94a3b8; padding: 8px 12px; background: #1e293b; border-radius: 8px; line-height: 1.4; border: 1px solid transparent; transition: all 0.3s; margin-bottom: 6px; }
+  .about-link { color: #c9a96e; text-decoration: none; display: block; }
+  .about-link:hover { border-color: #c9a96e; box-shadow: 0 0 8px rgba(201,169,110,0.2); transform: translateX(4px); }
+  .slide-in { animation: slideIn 0.4s ease both; }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-16px)} to{opacity:1;transform:translateX(0)} }
+  .about-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .about-tag { font-size: 11px; padding: 4px 10px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.3); border-radius: 20px; color: #c9a96e; animation: tagFloat 3s ease-in-out infinite; transition: all 0.3s; }
+  .about-tag:hover { background: rgba(201,169,110,0.25); transform: scale(1.08); }
+  @keyframes tagFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+  .about-cert { position: relative; }
+  .about-cert::after { content: '✓'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #c9a96e; font-size: 12px; opacity: 0.6; }
+  .shimmer { position: relative; overflow: hidden; }
+  .shimmer::before { content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg,transparent,rgba(201,169,110,0.15),transparent); animation: shimmer 3s ease-in-out infinite; }
+  @keyframes shimmer { 0%{left:-100%} 100%{left:200%} }
+  .about-built { text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #2a2a3e; font-size: 12px; color: #64748b; animation: breathe 4s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{opacity:0.5} 50%{opacity:1} }
   .install-banner { width: 100%; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; display: none; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
   .install-banner.show { display: flex; }
   .install-banner-text { font-size: 13px; color: #1e40af; font-weight: 500; }
@@ -159,39 +192,45 @@
 
 <!-- About Modal -->
 <div class="modal" id="aboutModal">
-  <div class="modal-box">
+  <div class="modal-box" style="background:#1a1a2e;color:#e2e8f0;">
     <div class="modal-header">
-      <div class="modal-title">Tentang Developer</div>
-      <button class="modal-close" onclick="closeAbout()">x</button>
+      <div class="modal-title" style="color:#c9a96e;">Tentang Developer</div>
+      <button class="modal-close" onclick="closeAbout()" style="background:#2a2a3e;color:#e2e8f0;">x</button>
     </div>
+
     <div class="about-profile">
       <img src="https://raw.githubusercontent.com/riyargb/MesinJurnal/main/FB_IMG_1782298978998.jpg" class="about-avatar" alt="Salman">
       <div>
-        <div class="about-name">Salman</div>
+        <div class="about-name-anim">Salman</div>
         <div class="about-role">Mahasiswa Sistem Informasi | AI Engineer Track | Jakarta</div>
         <div class="social-links">
-          <a href="https://www.tiktok.com/@uiiiaiuuiiai?_r=1&_t=ZS-96VphjVQ4Pt" target="_blank" class="social-link">TikTok</a>
-          <a href="https://www.linkedin.com/in/salman-andreas-1aa7173a7" target="_blank" class="social-link">LinkedIn</a>
+          <a href="https://www.tiktok.com/@uiiiaiuuiiai?_r=1&_t=ZS-96VphjVQ4Pt" target="_blank" class="social-tiktok">TikTok</a>
+          <a href="https://www.linkedin.com/in/salman-andreas-1aa7173a7" target="_blank" class="social-linkedin">LinkedIn</a>
         </div>
       </div>
     </div>
+
+    <div class="about-bio"><span id="typedBio"></span><span class="about-cursor">|</span></div>
+
     <div class="about-section">
       <div class="about-section-title">Bots & AI</div>
-      <div class="about-item">KontenAI — Telegram bot content creation (Groq + Pollinations.ai + Gemini)</div>
-      <div class="about-item"><a href="https://salman0812.github.io/FraudDetection-ByMe/" target="_blank">Fraud Detection — ML project deteksi transaksi mencurigakan</a></div>
-      <div class="about-item">SalmanHelper — Google Gemini Gem dengan 5 modul akademik</div>
+      <div class="about-item slide-in" style="animation-delay:0.05s">KontenAI — Telegram bot content creation (Groq + Pollinations.ai + Gemini)</div>
+      <a href="https://salman0812.github.io/FraudDetection-ByMe/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.1s">Fraud Detection — ML project deteksi transaksi mencurigakan</a>
+      <div class="about-item slide-in" style="animation-delay:0.15s">SalmanHelper — Google Gemini Gem dengan 5 modul akademik</div>
     </div>
+
     <div class="about-section">
       <div class="about-section-title">Web Apps</div>
-      <div class="about-item"><a href="https://mesin-jurnal.vercel.app/" target="_blank">Mesin Jurnal — Pencarian & manajemen referensi jurnal ilmiah</a></div>
-      <div class="about-item"><a href="https://chiese.vercel.app" target="_blank">Chiese — Game boosting marketplace</a></div>
-      <div class="about-item"><a href="https://kanjime.vercel.app/" target="_blank">KanjiMe — JLPT learning PWA dengan AI + sertifikat</a></div>
-      <div class="about-item"><a href="https://mesintugas.vercel.app" target="_blank">Mesin Tugas UT — AI academic assistant (Next.js + FastAPI + Groq)</a></div>
-      <div class="about-item"><a href="https://chuangku.vercel.app/" target="_blank">Chuang Ku — Digital marketplace + Telegram bot</a></div>
-      <div class="about-item"><a href="https://businessanalytic.vercel.app" target="_blank">Business Analytic AI — Dashboard analitik berbasis AI</a></div>
-      <div class="about-item"><a href="https://cliniqu.vercel.app/" target="_blank">ClinIQ — Medical analytics app</a></div>
-      <div class="about-item"><a href="https://salman0812.github.io/CodingCamp-30Mar26-salman/" target="_blank">Expense & Budget Visualizer — Budget tracker</a></div>
+      <a href="https://mesin-jurnal.vercel.app/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.05s">Mesin Jurnal — Pencarian & manajemen referensi jurnal ilmiah</a>
+      <a href="https://chiese.vercel.app" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.1s">Chiese — Game boosting marketplace</a>
+      <a href="https://kanjime.vercel.app/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.15s">KanjiMe — JLPT learning PWA dengan AI + sertifikat</a>
+      <a href="https://mesintugas.vercel.app" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.2s">Mesin Tugas UT — AI academic assistant (Next.js + FastAPI + Groq)</a>
+      <a href="https://chuangku.vercel.app/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.25s">Chuang Ku — Digital marketplace + Telegram bot</a>
+      <a href="https://businessanalytic.vercel.app" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.3s">Business Analytic AI — Dashboard analitik berbasis AI</a>
+      <a href="https://cliniqu.vercel.app/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.35s">ClinIQ — Medical analytics app</a>
+      <a href="https://salman0812.github.io/CodingCamp-30Mar26-salman/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.4s">Expense & Budget Visualizer — Budget tracker</a>
     </div>
+
     <div class="about-section">
       <div class="about-section-title">Tech Stack</div>
       <div class="about-tags">
@@ -207,18 +246,37 @@
         <span class="about-tag">Claude</span>
       </div>
     </div>
+
     <div class="about-section">
       <div class="about-section-title">Sertifikat</div>
-      <div class="about-item">RevoU Applied AI</div>
-      <div class="about-item">Microsoft Elevate (Generative AI & ML)</div>
-      <div class="about-item">Dicoding METC (Microsoft Fabric + Azure Gen AI)</div>
-      <div class="about-item">DBS Coding Camp AI Engineer Track</div>
+      <div class="about-item about-cert shimmer slide-in" style="animation-delay:0s">RevoU Applied AI</div>
+      <div class="about-item about-cert shimmer slide-in" style="animation-delay:0.3s">Microsoft Elevate (Generative AI & ML)</div>
+      <div class="about-item about-cert shimmer slide-in" style="animation-delay:0.6s">Dicoding METC (Microsoft Fabric + Azure Gen AI)</div>
+      <div class="about-item about-cert shimmer slide-in" style="animation-delay:0.9s">DBS Coding Camp AI Engineer Track</div>
     </div>
-    <div class="about-footer">Mesin Jurnal — Built by Salman · 2026</div>
+
+    <div class="about-built">Mesin Jurnal — Built by Salman · 2026</div>
   </div>
 </div>
 
+</div>
+
 <script>
+
+function startTyping() {
+  var fullBio = 'Mahasiswa aktif Universitas Terbuka (UPBJJ Jakarta Barat) yang passionate di bidang AI Engineering, Web Development, dan Cybersecurity.';
+  var el = document.getElementById('typedBio');
+  if (!el) return;
+  var i = 0, typing = true;
+  function tick() {
+    if (typing) {
+      if (i < fullBio.length) { el.textContent += fullBio[i++]; setTimeout(tick, 45); }
+      else { typing = false; setTimeout(tick, 2500); }
+    } else { el.textContent = ''; i = 0; typing = true; setTimeout(tick, 400); }
+  }
+  setTimeout(tick, 600);
+}
+
 if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 
 let deferredPrompt = null;
@@ -241,7 +299,7 @@ let foundPDFs = {};
 
 function closeModal() { document.getElementById('modal').classList.remove('show'); }
 function closePreview() { document.getElementById('previewModal').classList.remove('show'); }
-function openAbout() { document.getElementById('aboutModal').classList.add('show'); }
+function openAbout() { document.getElementById('aboutModal').classList.add('show'); startTyping(); }
 function closeAbout() { document.getElementById('aboutModal').classList.remove('show'); }
 ['modal','previewModal','aboutModal'].forEach(id => {
   document.getElementById(id).addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
