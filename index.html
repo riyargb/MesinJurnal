@@ -108,7 +108,24 @@
   .btn-install { background: #1e3a8a; color: white; border: none; padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; }
 </style>
 </head>
-<body>
+<body><style>
+#splash{position:fixed;inset:0;background:#1e3a8a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.4s ease;}
+#splash.hide{opacity:0;pointer-events:none;}
+#splash-logo{width:90px;height:90px;border-radius:22px;object-fit:cover;margin-bottom:20px;animation:splashPop 0.5s ease;}
+#splash-name{color:white;font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;}
+#splash-desc{color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:32px;}
+#splash-bar{width:160px;height:3px;background:rgba(255,255,255,0.2);border-radius:99px;overflow:hidden;}
+#splash-fill{height:100%;background:white;border-radius:99px;animation:fillBar 1.2s ease forwards;}
+@keyframes splashPop{from{transform:scale(0.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+@keyframes fillBar{from{width:0%;}to{width:100%;}}
+</style>
+<div id="splash">
+<img src="/icon.jpg" id="splash-logo" alt="Mesin Jurnal">
+<div id="splash-name">Mesin Jurnal</div>
+<div id="splash-desc">Pencarian & manajemen referensi jurnal ilmiah</div>
+<div id="splash-bar"><div id="splash-fill"></div></div>
+</div>
+<script>window.addEventListener('load',()=>{setTimeout(()=>{const s=document.getElementById('splash');s.classList.add('hide');setTimeout(()=>s.remove(),400);},1300);});</script>
 <div class="container">
   <div class="install-banner" id="installBanner">
     <span class="install-banner-text">Install Mesin Jurnal ke homescreen</span>
