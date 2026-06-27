@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesin Jurnal</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1e3a8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mesin Jurnal">
+<link rel="apple-touch-icon" href="/icon.jpg">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #1a1a2e; font-size: 14px; min-height: 100vh; }
+  .container { max-width: 680px; margin: 0 auto; padding: 0 16px 60px; display: flex; flex-direction: column; align-items: center; }
+  .app-header { width: 100%; text-align: center; padding: 52px 0 36px; }
+  .app-logo { width: 88px; height: 88px; border-radius: 22px; object-fit: cover; box-shadow: 0 4px 20px rgba(30,58,138,0.18); margin: 0 auto 14px; display: block; }
+  .app-name { font-size: 24px; font-weight: 800; color: #1e3a8a; letter-spacing: -0.5px; }
+  .app-desc { font-size: 13px; color: #6b7280; margin-top: 5px; }
+  .section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border: 1px solid #e8ecf0; width: 100%; }
+  .section-title { font-size: 11px; font-weight: 700; color: #6b7280; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.8px; }
+  input[type=text] { width: 100%; padding: 11px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s; background: #fafafa; }
+  input[type=text]:focus { border-color: #2563eb; background: white; }
+  input[type=file] { width: 100%; border: 1.5px dashed #cbd5e1; padding: 12px; border-radius: 8px; background: #f8fafc; cursor: pointer; font-size: 13px; color: #64748b; margin-top: 8px; }
+  .btn { padding: 9px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; }
+  .btn-primary { background: #1e3a8a; color: white; margin-top: 10px; width: 100%; padding: 12px; font-size: 14px; border-radius: 9px; }
+  .btn-primary:hover { background: #1e40af; }
+  .btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
+  .btn-outline { background: white; color: #374151; border: 1px solid #d1d5db; }
+  .btn-outline:hover { background: #f9fafb; }
+  .btn-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .btn-blue:hover { background: #dbeafe; }
+  .btn-export { background: white; color: #6b21a8; border: 1px solid #e9d5ff; }
+  .btn-export:hover { background: #faf5ff; }
+  .btn-scan-all { background: #1e3a8a; color: white; border: none; }
+  .btn-scan-all:hover { background: #1e40af; }
+  .btn-download-all { background: #166534; color: white; border: none; display: none; }
+  .btn-download-all:hover { background: #15803d; }
+  .btn-download-all.show { display: inline-flex; align-items: center; gap: 6px; }
+  .btn-preview-all { background: #7c3aed; color: white; border: none; display: none; }
+  .btn-preview-all:hover { background: #6d28d9; }
+  .btn-preview-all.show { display: inline-flex; align-items: center; gap: 6px; }
+  .toolbar { display: flex; gap: 7px; margin: 12px 0 4px; flex-wrap: wrap; align-items: center; }
+  .toolbar-label { font-size: 11px; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .jurnal-card { border: 1px solid #e8ecf0; border-radius: 9px; padding: 14px 15px; margin-bottom: 9px; background: white; }
+  .jurnal-title { font-size: 14px; font-weight: 600; color: #1e3a8a; margin-bottom: 6px; line-height: 1.45; }
+  .jurnal-title a { color: #1e3a8a; text-decoration: none; }
+  .jurnal-title a:hover { text-decoration: underline; }
+  .jurnal-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .tag { font-size: 11px; background: #f1f5f9; color: #475569; border-radius: 5px; padding: 2px 8px; border: 1px solid #e2e8f0; }
+  .jurnal-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .abstract-box { font-size: 13px; color: #4b5563; line-height: 1.6; background: #f8fafc; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #93c5fd; margin-top: 8px; display: none; }
+  .abstract-box.show { display: block; }
+  .pdf-results { margin-top: 8px; display: none; }
+  .pdf-results.show { display: block; }
+  .pdf-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; background: #f8fafc; border-radius: 6px; margin-bottom: 6px; border: 1px solid #e8ecf0; }
+  .pdf-badge { font-size: 10px; font-weight: 700; background: #dc2626; color: white; border-radius: 4px; padding: 2px 5px; flex-shrink: 0; margin-top: 2px; }
+  .pdf-item-info { flex: 1; min-width: 0; }
+  .pdf-item-title a { font-size: 12px; font-weight: 600; color: #1e40af; text-decoration: none; word-break: break-all; }
+  .pdf-item-title a:hover { text-decoration: underline; }
+  .pdf-item-src { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .pdf-item-actions { display: flex; gap: 6px; margin-top: 6px; }
+  .btn-preview { font-size: 11px; padding: 3px 10px; background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; border-radius: 5px; cursor: pointer; font-weight: 600; }
+  .btn-dl { font-size: 11px; padding: 3px 10px; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-radius: 5px; cursor: pointer; font-weight: 600; }
+  .file-header { background: #f1f5f9; padding: 8px 12px; border-radius: 7px; font-weight: 700; margin-bottom: 10px; margin-top: 14px; color: #1e3a8a; font-size: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; }
+  .badge { background: #1e3a8a; color: white; border-radius: 99px; padding: 2px 9px; font-size: 11px; }
+  .summary { color: #6b7280; margin: 10px 0 6px; font-size: 13px; }
+  .loading { color: #2563eb; font-style: italic; margin-top: 10px; font-size: 13px; }
+  .error { color: #dc2626; margin-top: 10px; font-size: 13px; }
+  .scan-progress { font-size: 12px; color: #6b7280; margin-top: 4px; height: 16px; }
+  .divider { border: none; border-top: 1px solid #e8ecf0; margin: 12px 0; }
+  .app-footer { width: 100%; text-align: center; padding: 8px 0 0; }
+  .about-btn { background: none; border: none; color: #9ca3af; font-size: 12px; cursor: pointer; padding: 6px 12px; border-radius: 6px; }
+  .about-btn:hover { color: #1e3a8a; background: #f1f5f9; }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: flex-end; }
+  .modal.show { display: flex; }
+  .modal-box { background: white; border-radius: 20px 20px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 680px; max-height: 88vh; overflow-y: auto; box-shadow: 0 -4px 32px rgba(0,0,0,0.12); }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .modal-title { font-size: 15px; font-weight: 700; color: #1e3a8a; flex: 1; padding-right: 12px; line-height: 1.4; }
+  .modal-close { cursor: pointer; font-size: 18px; color: #9ca3af; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .modal-close:hover { color: #374151; }
+  .modal-row { margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
+  .modal-label { font-weight: 700; color: #374151; display: block; margin-bottom: 2px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .modal-abstract { background: #f8fafc; padding: 10px 12px; border-radius: 7px; border-left: 3px solid #93c5fd; font-size: 13px; line-height: 1.6; color: #4b5563; margin-top: 6px; }
+  .pdf-preview-frame { width: 100%; height: 70vh; border: none; border-radius: 8px; margin-top: 12px; background: #f1f5f9; }
+  .preview-item { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e8ecf0; }
+  .preview-item:last-child { border-bottom: none; }
+  .preview-item-title { font-size: 13px; font-weight: 700; color: #1e3a8a; margin-bottom: 8px; }
+  .about-profile { display: flex; gap: 16px; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e8ecf0; }
+  .about-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; object-position: center 20%; border: 2px solid #1e3a8a; flex-shrink: 0; }
+  .about-name { font-size: 18px; font-weight: 800; color: #1e3a8a; margin-bottom: 3px; }
+  .about-role { font-size: 12px; color: #6b7280; line-height: 1.5; margin-bottom: 8px; }
+  .social-links { display: flex; gap: 6px; flex-wrap: wrap; }
+  .social-link { font-size: 11px; padding: 3px 10px; border-radius: 20px; text-decoration: none; font-weight: 600; border: 1px solid #d1d5db; color: #374151; background: #f9fafb; }
+  .social-link:hover { background: #f1f5f9; }
+  .about-section { margin-bottom: 16px; }
+  .about-section-title { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .about-item { font-size: 12px; color: #4b5563; padding: 8px 11px; background: #f8fafc; border-radius: 7px; margin-bottom: 5px; border: 1px solid #e8ecf0; line-height: 1.4; }
+  .about-item a { color: #1e3a8a; text-decoration: none; font-weight: 600; display: block; }
+  .about-item a:hover { text-decoration: underline; }
+  .about-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .about-tag { font-size: 11px; background: #eff6ff; color: #1d4ed8; border-radius: 5px; padding: 3px 9px; border: 1px solid #bfdbfe; }
+  .about-footer { text-align: center; margin-top: 20px; padding-top: 14px; border-top: 1px solid #e8ecf0; font-size: 12px; color: #9ca3af; }
+
+  /* ABOUT MODAL STYLES */
+  .about-profile { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #2a2a3e; }
+  .about-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; object-position: center 30%; border: 2px solid #c9a96e; box-shadow: 0 0 16px rgba(201,169,110,0.3); flex-shrink: 0; }
+  .about-name-anim { font-size: 20px; font-weight: 800; margin-bottom: 4px; background: linear-gradient(90deg,#c9a96e,#e8c99a,#1a7abf,#c0392b,#c9a96e); background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: nameColor 6s ease infinite; }
+  @keyframes nameColor { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .about-role { font-size: 11px; color: #94a3b8; line-height: 1.5; margin-bottom: 8px; }
+  .social-tiktok { font-size: 11px; padding: 4px 10px; border-radius: 20px; text-decoration: none; font-weight: 600; background: linear-gradient(90deg,#69C9D0,#EE1D52,#69C9D0); background-size: 200% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: tiktokColor 4s ease infinite; border: 1px solid #EE1D52; }
+  @keyframes tiktokColor { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .social-linkedin { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: #1e293b; border: 1px solid #0077b5; color: #0077b5; text-decoration: none; font-weight: 600; animation: linkedinPulse 2s ease-in-out infinite; }
+  @keyframes linkedinPulse { 0%,100%{transform:scale(1);box-shadow:0 0 0 rgba(0,119,181,0)} 50%{transform:scale(1.06);box-shadow:0 0 10px rgba(0,119,181,0.5)} }
+  .about-bio { font-size: 13px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #2a2a3e; min-height: 52px; }
+  .about-cursor { animation: blink 0.8s infinite; color: #c9a96e; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .about-section { margin-bottom: 18px; }
+  .about-section-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #c9a96e; animation: headerGlow 3s ease-in-out infinite; }
+  @keyframes headerGlow { 0%,100%{text-shadow:0 0 0px rgba(201,169,110,0)} 50%{text-shadow:0 0 8px rgba(201,169,110,0.6)} }
+  .about-item { font-size: 12px; color: #94a3b8; padding: 8px 12px; background: #1e293b; border-radius: 8px; line-height: 1.4; border: 1px solid transparent; transition: all 0.3s; margin-bottom: 6px; }
+  .about-link { color: #c9a96e; text-decoration: none; display: block; }
+  .about-link:hover { border-color: #c9a96e; box-shadow: 0 0 8px rgba(201,169,110,0.2); transform: translateX(4px); }
+  .slide-in { animation: slideIn 0.4s ease both; }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-16px)} to{opacity:1;transform:translateX(0)} }
+  .about-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .about-tag { font-size: 11px; padding: 4px 10px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.3); border-radius: 20px; color: #c9a96e; animation: tagFloat 3s ease-in-out infinite; transition: all 0.3s; }
+  .about-tag:hover { background: rgba(201,169,110,0.25); transform: scale(1.08); }
+  @keyframes tagFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+  .about-cert { position: relative; }
+  .about-cert::after { content: '✓'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #c9a96e; font-size: 12px; opacity: 0.6; }
+  .shimmer { position: relative; overflow: hidden; }
+  .shimmer::before { content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg,transparent,rgba(201,169,110,0.15),transparent); animation: shimmer 3s ease-in-out infinite; }
+  @keyframes shimmer { 0%{left:-100%} 100%{left:200%} }
+  .about-built { text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #2a2a3e; font-size: 12px; color: #64748b; animation: breathe 4s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{opacity:0.5} 50%{opacity:1} }
+  .install-banner { width: 100%; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; display: none; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+  .install-banner.show { display: flex; }
+  .install-banner-text { font-size: 13px; color: #1e40af; font-weight: 500; }
+  .btn-install { background: #1e3a8a; color: white; border: none; padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; }
+</style>
+<div class="container">
+  <div class="install-banner" id="installBanner">
+    <span class="install-banner-text">Install Mesin Jurnal ke homescreen</span>
+    <button class="btn-install" id="installBtn">Install</button>
+  </div>
+  <div class="app-header">
+    <img src="/icon.jpg" class="app-logo" alt="Mesin Jurnal" onerror="this.style.background='#1e3a8a'">
+    <div class="app-name">Mesin Jurnal</div>
+    <div class="app-desc">Pencarian & manajemen referensi jurnal ilmiah</div>
+  </div>
+  <div class="section">
+    <div class="section-title">Pencarian</div>
+    <input type="text" id="query" placeholder="Kata kunci pencarian jurnal..." onkeydown="if(event.key==='Enter') cariJurnal()">
+    <button class="btn btn-primary" onclick="cariJurnal()" id="btnCari">Cari Jurnal</button>
+    <div id="hasil-cari"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">Upload Referensi</div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:4px">Format: .ris .pdf .txt .csv .xlsx .png .jpg — Maks. 4 file</div>
+    <input type="file" id="fileInput" accept=".ris,.pdf,.txt,.csv,.xlsx,.png,.jpg,.jpeg" multiple>
+    <button class="btn btn-primary" onclick="uploadFile()" id="btnUpload">Proses File</button>
+    <div id="hasil-upload"></div>
+  </div>
+  <div class="app-footer">
+    <button class="about-btn" onclick="openAbout()">Tentang Developer</button>
+  </div>
+</div>
+
+<!-- DOI Modal -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Detail</div>
+      <button class="modal-close" onclick="closeModal()">x</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Preview All Modal -->
+<div class="modal" id="previewModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Preview PDF</div>
+      <button class="modal-close" onclick="closePreview()">x</button>
+    </div>
+    <div id="preview-body"></div>
+  </div>
+</div>
+
+<!-- About Modal -->
+<div class="modal" id="aboutModal">
+  <div class="modal-box" style="background:#1a1a2e;color:#e2e8f0;">
+    <div class="modal-header">
+      <div class="modal-title" style="color:#c9a96e;">Tentang Developer</div>
+      <button class="modal-close" onclick="closeAbout()" style="background:#2a2a3e;color:#e2e8f0;">x</button>
+    </div>
+
+    <div class="about-profile">
+      <img src="https://raw.githubusercontent.com/riyargb/MesinJurnal/main/FB_IMG_1782298978998.jpg" class="about-avatar" alt="Salman">
+      <div>
+        <div class="about-name-anim">Salman</div>
+        <div class="about-role">Mahasiswa Sistem Informasi | AI Engineer Track | Jakarta</div>
+        <div class="social-links">
+          <a href="https://www.tiktok.com/@uiiiaiuuiiai?_r=1&_t=ZS-96VphjVQ4Pt" target="_blank" class="social-tiktok">TikTok</a>
+          <a href="https://www.linkedin.com/in/salman-andreas-1aa7173a7" target="_blank" class="social-linkedin">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-bio"><span id="typedBio"></span><span class="about-cursor">|</span></div>
+
+    <div class="about-section">
+      <div class="about-section-title">Bots & AI</div>
+      <div class="about-item slide-in" style="animation-delay:0.05s">KontenAI — Telegram bot content creation (Groq + Pollinations.ai + Gemini)</div>
+      <a href="https://salman0812.github.io/FraudDetection-ByMe/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.1s">Fraud Detection — ML project deteksi transaksi mencurigakan</a>
+      <div class="about-item slide-in" style="animation-delay:0.15s">SalmanHelper — Google Gemini Gem dengan 5 modul akademik</div>
+    </div>
+
+    <div class="about-section">
+      <div class="about-section-title">Web Apps</div>
+      <a href="https://mesin-jurnal.vercel.app/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.05s">Mesin Jurnal — Pencarian & manajemen referensi jurnal ilmiah</a>
+      <a href="https://chiese.vercel.app" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.1s">Chiese — Game boosting marketplace</a>
+      <a href="https://kanjime.vercel.app/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.15s">KanjiMe — JLPT learning PWA dengan AI + sertifikat</a>
+      <a href="https://mesintugas.vercel.app" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.2s">Mesin Tugas UT — AI academic assistant (Next.js + FastAPI + Groq)</a>
+      <a href="https://chuangku.vercel.app/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.25s">Chuang Ku — Digital marketplace + Telegram bot</a>
+      <a href="https://businessanalytic.vercel.app" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.3s">Business Analytic AI — Dashboard analitik berbasis AI</a>
+      <a href="https://cliniqu.vercel.app/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.35s">ClinIQ — Medical analytics app</a>
+      <a href="https://salman0812.github.io/CodingCamp-30Mar26-salman/" target="_blank" class="about-item about-link slide-in" style="animation-delay:0.4s">Expense & Budget Visualizer — Budget tracker</a>
+    </div>
+
+    <div class="about-section">
+      <div class="about-section-title">Tech Stack</div>
+      <div class="about-tags">
+        <span class="about-tag">Python</span>
+        <span class="about-tag">JavaScript</span>
+        <span class="about-tag">TypeScript</span>
+        <span class="about-tag">Next.js</span>
+        <span class="about-tag">FastAPI</span>
+        <span class="about-tag">Supabase</span>
+        <span class="about-tag">Groq</span>
+        <span class="about-tag">Git</span>
+        <span class="about-tag">Kali Linux</span>
+        <span class="about-tag">Claude</span>
+      </div>
+    </div>
+
+    <div class="about-section">
+      <div class="about-section-title">Sertifikat</div>
+      <div class="about-item about-cert shimmer slide-in" style="animation-delay:0s">RevoU Applied AI</div>
+      <div class="about-item about-cert shimmer slide-in" style="animation-delay:0.3s">Microsoft Elevate (Generative AI & ML)</div>
+      <div class="about-item about-cert shimmer slide-in" style="animation-delay:0.6s">Dicoding METC (Microsoft Fabric + Azure Gen AI)</div>
+      <div class="about-item about-cert shimmer slide-in" style="animation-delay:0.9s">DBS Coding Camp AI Engineer Track</div>
+    </div>
+
+    <div class="about-built">Mesin Jurnal — Built by Salman · 2026</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+
+function startTyping() {
+  var fullBio = 'Mahasiswa aktif Universitas Terbuka (UPBJJ Jakarta Barat) yang passionate di bidang AI Engineering, Web Development, dan Cybersecurity.';
+  var el = document.getElementById('typedBio');
+  if (!el) return;
+  var i = 0, typing = true;
+  function tick() {
+    if (typing) {
+      if (i < fullBio.length) { el.textContent += fullBio[i++]; setTimeout(tick, 45); }
+      else { typing = false; setTimeout(tick, 2500); }
+    } else { el.textContent = ''; i = 0; typing = true; setTimeout(tick, 400); }
+  }
+  setTimeout(tick, 600);
+}
+
+if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
+
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('show');
+});
+window.addEventListener('appinstalled', () => document.getElementById('installBanner').classList.remove('show'));
+
+let allData = [], absCounter = 0;
+// Store found PDFs per container: { containerId: [{title, url}] }
+let foundPDFs = {};
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+function closePreview() { document.getElementById('previewModal').classList.remove('show'); }
+function openAbout() { document.getElementById('aboutModal').classList.add('show'); startTyping(); }
+function closeAbout() { document.getElementById('aboutModal').classList.remove('show'); }
+['modal','previewModal','aboutModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
+});
+
+function renderJurnalCard(item) {
+  const id = 'c' + (absCounter++);
+  const penulis = Array.isArray(item.penulis) ? item.penulis.join(", ") : (item.penulis||"");
+  const judul = item.judul||item.title||"(Judul tidak tersedia)";
+  const titleHtml = item.link ? `<a href="${item.link}" target="_blank">${judul}</a>` : judul;
+  let meta = '';
+  if (item.tahun) meta += `<span class="tag">${item.tahun}</span>`;
+  if (item.jurnal) meta += `<span class="tag">${item.jurnal.length>45?item.jurnal.substring(0,45)+'...':item.jurnal}</span>`;
+  if (penulis) meta += `<span class="tag">${penulis.length>55?penulis.substring(0,55)+'...':penulis}</span>`;
+  const abstrak = item.abstrak||item.snippet||"";
+  const absBtn = abstrak ? `<button class="btn btn-outline" onclick="toggleAbs('${id}-abs')">Abstrak</button>` : '';
+  const absBox = abstrak ? `<div class="abstract-box" id="${id}-abs">${abstrak}</div>` : '';
+  const doiBtn = item.doi ? `<button class="btn btn-blue" onclick="fetchDOI('${item.doi}')">Detail DOI</button>` : '';
+  const judulEsc = judul.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  return `<div class="jurnal-card" id="${id}">
+    <div class="jurnal-title">${titleHtml}</div>
+    ${meta?`<div class="jurnal-meta">${meta}</div>`:''}
+    <div class="jurnal-actions">${absBtn}${doiBtn}<button class="btn btn-outline" onclick="cariPDFSingle('${item.doi||''}','${judulEsc}','${id}',null)">Cari PDF</button></div>
+    ${absBox}
+    <div class="pdf-results" id="${id}-pdf"></div>
+  </div>`;
+}
+
+function toggleAbs(id) { document.getElementById(id).classList.toggle('show'); }
+
+async function fetchPDF(doi, judul) {
+  try {
+    const params = new URLSearchParams();
+    if (doi) params.append('doi', doi);
+    if (judul) params.append('judul', judul);
+    const res = await fetch('/pdf?'+params.toString());
+    return await res.json();
+  } catch(e) { return {error: e.message}; }
+}
+
+function renderPDFResults(d, judul) {
+  if (d.error) return `<p class="error">${d.error}</p>`;
+  if (!d.pdf_url) return `<p style="font-size:12px;color:#6b7280;padding:4px 0">PDF tidak tersedia secara open access.</p>`;
+  const url = d.pdf_url;
+  const display = url.length>65 ? url.substring(0,65)+'...' : url;
+  const judulEsc = (judul||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  return `<div class="pdf-item">
+    <span class="pdf-badge">PDF</span>
+    <div class="pdf-item-info">
+      <div class="pdf-item-title"><a href="${url}" target="_blank">${display}</a></div>
+      <div class="pdf-item-src">via ${d.source}</div>
+      <div class="pdf-item-actions">
+        <button class="btn-preview" onclick="previewSinglePDF('${url}','${judulEsc}')">Preview</button>
+        <button class="btn-dl" onclick="downloadPDF('${url}','${judulEsc}')">Download</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function cariPDFSingle(doi, judul, cardId, containerId) {
+  const box = document.getElementById(cardId+'-pdf');
+  box.innerHTML = '<p class="loading">Mencari PDF...</p>';
+  box.classList.add('show');
+  const result = await fetchPDF(doi, judul);
+  box.innerHTML = renderPDFResults(result, judul);
+  // Store result for batch operations
+  if (containerId && result.pdf_url) {
+    if (!foundPDFs[containerId]) foundPDFs[containerId] = [];
+    foundPDFs[containerId].push({ title: judul, url: result.pdf_url });
+  }
+  return result;
+}
+
+function previewSinglePDF(url, judul) {
+  document.getElementById('preview-body').innerHTML = `
+    <div class="preview-item">
+      <div class="preview-item-title">${judul||url}</div>
+      <iframe src="${url}" class="pdf-preview-frame" title="${judul||'PDF'}"></iframe>
+      <div style="margin-top:8px">
+        <button class="btn btn-outline" style="font-size:12px;padding:6px 12px" onclick="downloadPDF('${url}','${judul||'document'}')">Download PDF ini</button>
+      </div>
+    </div>`;
+  document.getElementById('previewModal').classList.add('show');
+}
+
+function downloadPDF(url, judul) {
+  const a = document.createElement('a');
+  a.href = url; a.target = '_blank';
+  a.download = (judul||'document').substring(0,50)+'.pdf';
+  a.click();
+}
+
+function downloadAllPDF(containerId) {
+  const pdfs = foundPDFs[containerId]||[];
+  if (pdfs.length===0) return alert('Tidak ada PDF yang ditemukan.');
+  pdfs.forEach((p, i) => {
+    setTimeout(() => downloadPDF(p.url, p.title), i*800);
+  });
+}
+
+function previewAllPDF(containerId) {
+  const pdfs = foundPDFs[containerId]||[];
+  if (pdfs.length===0) return alert('Tidak ada PDF yang ditemukan.');
+  let html = '';
+  pdfs.forEach(p => {
+    html += `<div class="preview-item">
+      <div class="preview-item-title">${p.title||p.url}</div>
+      <iframe src="${p.url}" class="pdf-preview-frame" title="${p.title||'PDF'}"></iframe>
+      <div style="margin-top:8px">
+        <button class="btn btn-outline" style="font-size:12px;padding:6px 12px" onclick="downloadPDF('${p.url}','${(p.title||'document').replace(/'/g,"\\'")}')">Download PDF ini</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('preview-body').innerHTML = html;
+  document.getElementById('previewModal').classList.add('show');
+}
+
+async function scanAllPDF(cards, containerId) {
+  foundPDFs[containerId] = [];
+  const progressEl = document.getElementById(containerId+'-progress');
+  const btn = document.getElementById(containerId+'-btn');
+  const dlBtn = document.getElementById(containerId+'-dlbtn');
+  const pvBtn = document.getElementById(containerId+'-pvbtn');
+  if (btn) { btn.disabled=true; btn.textContent='Memindai...'; }
+  if (dlBtn) dlBtn.classList.remove('show');
+  if (pvBtn) pvBtn.classList.remove('show');
+
+  for (let i=0; i<cards.length; i++) {
+    if (progressEl) progressEl.textContent = `Memindai ${i+1} dari ${cards.length}...`;
+    const {id, doi, judul} = cards[i];
+    const box = document.getElementById(id+'-pdf');
+    if (box) {
+      box.innerHTML = '<p class="loading">Mencari...</p>';
+      box.classList.add('show');
+      const result = await fetchPDF(doi, judul);
+      box.innerHTML = renderPDFResults(result, judul);
+      if (result.pdf_url) foundPDFs[containerId].push({title: judul, url: result.pdf_url});
+    }
+    await new Promise(r=>setTimeout(r,350));
+  }
+
+  const found = (foundPDFs[containerId]||[]).length;
+  if (progressEl) progressEl.textContent = `Selesai. ${found} PDF ditemukan.`;
+  if (btn) { btn.disabled=false; btn.textContent='Cari Semua PDF'; }
+  if (found>0) {
+    if (dlBtn) dlBtn.classList.add('show');
+    if (pvBtn) pvBtn.classList.add('show');
+  }
+}
+
+async function fetchDOI(doi) {
+  document.getElementById('modal-title').textContent = 'Memuat...';
+  document.getElementById('modal-body').innerHTML = '<p class="loading">Mengambil data dari CrossRef...</p>';
+  document.getElementById('modal').classList.add('show');
+  try {
+    const res = await fetch('/doi?doi='+encodeURIComponent(doi));
+    const d = await res.json();
+    if (d.error) { document.getElementById('modal-body').innerHTML=`<p class="error">${d.error}</p>`; return; }
+    const penulis = Array.isArray(d.penulis)?d.penulis.join(", "):d.penulis;
+    document.getElementById('modal-title').textContent = d.judul||'Detail Jurnal';
+    document.getElementById('modal-body').innerHTML = `
+      <div class="modal-row"><span class="modal-label">Penulis</span>${penulis||'-'}</div>
+      <div class="modal-row"><span class="modal-label">Tahun</span>${d.tahun||'-'}</div>
+      <div class="modal-row"><span class="modal-label">Jurnal</span>${d.jurnal||'-'}</div>
+      <div class="modal-row"><span class="modal-label">DOI</span><a href="https://doi.org/${doi}" target="_blank">${doi}</a></div>
+      <hr style="border:none;border-top:1px solid #e8ecf0;margin:12px 0">
+      <span class="modal-label">Abstrak</span>
+      ${d.abstrak?`<div class="modal-abstract">${d.abstrak}</div>`:'<p style="color:#6b7280;font-size:13px;margin-top:4px">Abstrak tidak tersedia.</p>'}
+    `;
+  } catch(e) { document.getElementById('modal-body').innerHTML=`<p class="error">${e.message}</p>`; }
+}
+
+function exportData(format) {
+  if (allData.length===0) return alert('Tidak ada data untuk diekspor.');
+  fetch('/export/'+format, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(allData)
+  }).then(r=>r.blob()).then(blob=>{
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='export.'+format; a.click();
+  });
+}
+
+function buildToolbar(containerId) {
+  return `<div class="toolbar">
+    <span class="toolbar-label">Export:</span>
+    <button class="btn btn-export" onclick="exportData('ris')">.RIS</button>
+    <button class="btn btn-export" onclick="exportData('csv')">.CSV</button>
+    <button class="btn btn-scan-all" id="${containerId}-btn" onclick="scanAllPDF(window['cards_${containerId}'],'${containerId}')">Cari Semua PDF</button>
+    <button class="btn btn-preview-all" id="${containerId}-pvbtn" onclick="previewAllPDF('${containerId}')">Preview Semua PDF</button>
+    <button class="btn btn-download-all" id="${containerId}-dlbtn" onclick="downloadAllPDF('${containerId}')">Download Semua PDF</button>
+  </div>
+  <div class="scan-progress" id="${containerId}-progress"></div>`;
+}
+
+async function cariJurnal() {
+  const q = document.getElementById('query').value.trim();
+  if (!q) return alert('Masukkan kata kunci.');
+  const btn = document.getElementById('btnCari');
+  btn.disabled=true; btn.textContent='Mencari...';
+  document.getElementById('hasil-cari').innerHTML='<p class="loading">Mencari jurnal...</p>';
+  try {
+    const res = await fetch('/cari?q='+encodeURIComponent(q));
+    const data = await res.json();
+    if (!data.hasil||data.hasil.length===0) { document.getElementById('hasil-cari').innerHTML='<p>Tidak ada hasil.</p>'; return; }
+    allData = [...allData,...data.hasil];
+    const containerId = 'cari-'+Date.now();
+    const cards = [];
+    let html = `<p class="summary">${data.hasil.length} hasil untuk "${q}"</p>`;
+    html += buildToolbar(containerId);
+    data.hasil.forEach(item => {
+      const startIdx = absCounter;
+      html += renderJurnalCard(item);
+      cards.push({id:'c'+startIdx, doi:item.doi||'', judul:item.judul||item.title||''});
+    });
+    document.getElementById('hasil-cari').innerHTML = html;
+    window['cards_'+containerId] = cards;
+  } catch(e) { document.getElementById('hasil-cari').innerHTML=`<p class="error">${e.message}</p>`; }
+  finally { btn.disabled=false; btn.textContent='Cari Jurnal'; }
+}
+
+async function uploadFile() {
+  const files = document.getElementById('fileInput').files;
+  if (!files||files.length===0) return alert('Pilih file terlebih dahulu.');
+  if (files.length>4) return alert('Maksimal 4 file.');
+  const btn = document.getElementById('btnUpload');
+  btn.disabled=true; btn.textContent='Memproses...';
+  document.getElementById('hasil-upload').innerHTML='<p class="loading">Memproses file...</p>';
+  try {
+    const form = new FormData();
+    for (let f of files) form.append('files',f);
+    const res = await fetch('/upload',{method:'POST',body:form});
+    const data = await res.json();
+    if (data.error) { document.getElementById('hasil-upload').innerHTML=`<p class="error">${data.error}</p>`; return; }
+    const containerId = 'upload-'+Date.now();
+    const cards = [];
+    let html = '';
+    data.hasil.forEach(fr => {
+      html += `<div class="file-header"><span>${fr.file}</span><span class="badge">${fr.total||0} jurnal</span></div>`;
+      if (fr.error) { html+=`<p class="error">${fr.error}</p>`; }
+      else { fr.data.forEach(item => { allData.push(item); const s=absCounter; html+=renderJurnalCard(item); cards.push({id:'c'+s,doi:item.doi||'',judul:item.judul||''}); }); }
+    });
+    html += buildToolbar(containerId);
+    document.getElementById('hasil-upload').innerHTML = html;
+    window['cards_'+containerId] = cards;
+  } catch(e) { document.getElementById('hasil-upload').innerHTML=`<p class="error">${e.message}</p>`; }
+  finally { btn.disabled=false; btn.textContent='Proses File'; }
+}
+</script>
+</body>
+</html>
