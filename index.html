@@ -102,6 +102,49 @@
   .about-tags { display: flex; flex-wrap: wrap; gap: 5px; }
   .about-tag { font-size: 11px; background: #eff6ff; color: #1d4ed8; border-radius: 5px; padding: 3px 9px; border: 1px solid #bfdbfe; }
   .about-footer { text-align: center; margin-top: 20px; padding-top: 14px; border-top: 1px solid #e8ecf0; font-size: 12px; color: #9ca3af; }
+
+  /* AUTH */
+  .auth-bar{width:100%;background:white;border-radius:12px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border:1px solid #e8ecf0;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .auth-bar-left{display:flex;align-items:center;gap:10px;}
+  .auth-avatar{width:36px;height:36px;border-radius:50%;background:#1e3a8a;color:white;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+  .auth-email{font-size:13px;font-weight:600;color:#1e3a8a;}
+  .auth-tier{font-size:11px;color:#6b7280;}
+  .tier-badge{font-size:11px;font-weight:700;padding:2px 10px;border-radius:99px;}
+  .tier-free{background:#f1f5f9;color:#64748b;}
+  .tier-pro{background:#fef3c7;color:#d97706;}
+  .tier-max{background:#ede9fe;color:#7c3aed;}
+  .quota-bar{width:100%;background:white;border-radius:12px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border:1px solid #e8ecf0;display:none;}
+  .quota-bar.show{display:block;}
+  .quota-title{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+  .quota-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .quota-label{font-size:13px;color:#374151;}
+  .quota-count{font-size:13px;font-weight:700;color:#1e3a8a;}
+  .quota-track{height:4px;background:#f1f5f9;border-radius:99px;margin-top:3px;overflow:hidden;}
+  .quota-fill{height:100%;background:#1e3a8a;border-radius:99px;transition:width 0.3s;}
+  .quota-fill.danger{background:#dc2626;}
+  .quota-reset{font-size:11px;color:#6b7280;margin-top:8px;}
+  .upgrade-box{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 14px;margin-top:10px;display:none;}
+  .upgrade-box.show{display:block;}
+  .upgrade-title{font-size:13px;font-weight:700;color:#d97706;margin-bottom:8px;}
+  .upgrade-btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn-pro{background:#d97706;color:white;border:none;padding:8px 16px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;}
+  .btn-max{background:#7c3aed;color:white;border:none;padding:8px 16px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;}
+  /* AUTH MODAL */
+  .auth-modal-box{background:white;border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;max-width:680px;max-height:88vh;overflow-y:auto;box-shadow:0 -4px 32px rgba(0,0,0,0.12);}
+  .auth-tabs{display:flex;gap:0;margin-bottom:20px;border-radius:9px;overflow:hidden;border:1px solid #e8ecf0;}
+  .auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;background:#f8fafc;color:#6b7280;border:none;transition:all 0.2s;}
+  .auth-tab.active{background:#1e3a8a;color:white;}
+  .auth-field{margin-bottom:14px;}
+  .auth-field label{font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px;}
+  .auth-field input{width:100%;padding:11px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;}
+  .auth-field input:focus{border-color:#1e3a8a;}
+  .auth-submit{width:100%;padding:12px;background:#1e3a8a;color:white;border:none;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;}
+  .auth-submit:hover{background:#1e40af;}
+  .auth-msg{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:7px;display:none;}
+  .auth-msg.error{background:#fef2f2;color:#dc2626;display:block;}
+  .auth-msg.success{background:#f0fdf4;color:#166534;display:block;}
+  .btn-logout{background:white;color:#dc2626;border:1px solid #fecaca;font-size:12px;padding:5px 12px;border-radius:7px;cursor:pointer;}
+  .btn-login-prompt{background:#1e3a8a;color:white;border:none;font-size:12px;padding:5px 12px;border-radius:7px;cursor:pointer;font-weight:600;}
   .install-banner { width: 100%; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; display: none; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
   .install-banner.show { display: flex; }
   .install-banner-text { font-size: 13px; color: #1e40af; font-weight: 500; }
@@ -197,6 +240,48 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
     <span class="install-banner-text">Install Mesin Jurnal ke homescreen</span>
     <button class="btn-install" id="installBtn">Install</button>
   </div>
+  <!-- Auth Bar -->
+  <div class="auth-bar" id="authBar">
+    <div class="auth-bar-left">
+      <div class="auth-avatar" id="authAvatar">?</div>
+      <div>
+        <div class="auth-email" id="authEmail">Belum masuk</div>
+        <div class="auth-tier"><span class="tier-badge tier-free" id="tierBadge">Free</span></div>
+      </div>
+    </div>
+    <div id="authActions">
+      <button class="btn-login-prompt" onclick="openAuth()">Masuk</button>
+    </div>
+  </div>
+
+  <!-- Quota Bar -->
+  <div class="quota-bar" id="quotaBar">
+    <div class="quota-title">Kuota Penggunaan</div>
+    <div style="margin-bottom:10px;">
+      <div class="quota-row">
+        <span class="quota-label">Cari Jurnal</span>
+        <span class="quota-count"><span id="qCariUsed">0</span>/<span id="qCariLimit">5</span></span>
+      </div>
+      <div class="quota-track"><div class="quota-fill" id="qCariFill" style="width:0%"></div></div>
+    </div>
+    <div>
+      <div class="quota-row">
+        <span class="quota-label">Upload Referensi</span>
+        <span class="quota-count"><span id="qUploadUsed">0</span>/<span id="qUploadLimit">10</span></span>
+      </div>
+      <div class="quota-track"><div class="quota-fill" id="qUploadFill" style="width:0%"></div></div>
+    </div>
+    <div class="quota-reset" id="qReset"></div>
+    <div class="upgrade-box" id="upgradeBox">
+      <div class="upgrade-title">Upgrade untuk kuota lebih banyak</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:10px;">Isi kolom <b>Pesan</b> dengan email akun kamu agar tier otomatis terupdate.</div>
+      <div class="upgrade-btns">
+        <a href="https://saweria.co/Kikomaukiko?amount=50000" target="_blank" class="btn-pro">Pro — Rp50.000<br><span style="font-size:10px;font-weight:400">30x cari · 50x upload / 5 jam</span></a>
+        <a href="https://saweria.co/Kikomaukiko?amount=100000" target="_blank" class="btn-max">Max — Rp100.000<br><span style="font-size:10px;font-weight:400">50x cari · 100x upload / 5 jam</span></a>
+      </div>
+    </div>
+  </div>
+
   <div class="app-header">
     <img src="/icon.jpg" class="app-logo" alt="Mesin Jurnal" onerror="this.style.background='#1e3a8a'">
     <div class="app-name">Mesin Jurnal</div>
@@ -217,6 +302,32 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
   </div>
   <div class="app-footer">
     <button class="about-btn" onclick="openAbout()">Tentang Developer</button>
+  </div>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal" id="authModal">
+  <div class="auth-modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="auth-modal-title">Masuk / Daftar</div>
+      <button class="modal-close" onclick="closeAuth()">x</button>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Masuk</button>
+      <button class="auth-tab" onclick="switchTab('register')">Daftar</button>
+    </div>
+    <div id="tab-login">
+      <div class="auth-field"><label>Email</label><input type="email" id="login-email" placeholder="email@example.com"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="login-pass" placeholder="Password"></div>
+      <button class="auth-submit" onclick="doLogin()">Masuk</button>
+      <div class="auth-msg" id="login-msg"></div>
+    </div>
+    <div id="tab-register" style="display:none">
+      <div class="auth-field"><label>Email</label><input type="email" id="reg-email" placeholder="email@example.com"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="reg-pass" placeholder="Min. 6 karakter"></div>
+      <button class="auth-submit" onclick="doRegister()">Daftar</button>
+      <div class="auth-msg" id="reg-msg"></div>
+    </div>
   </div>
 </div>
 
@@ -310,6 +421,133 @@ function startTyping(){
   }
   setTimeout(tick,600);
 }
+
+// ── AUTH ──────────────────────────────────────────────────────
+var TOKEN = localStorage.getItem('mj_token') || null;
+var USER = null;
+var QUOTA = null;
+
+function openAuth(){ document.getElementById('authModal').classList.add('show'); }
+function closeAuth(){ document.getElementById('authModal').classList.remove('show'); }
+function switchTab(tab){
+  document.getElementById('tab-login').style.display = tab==='login'?'block':'none';
+  document.getElementById('tab-register').style.display = tab==='register'?'block':'none';
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1)));
+}
+
+async function doLogin(){
+  var email=document.getElementById('login-email').value.trim();
+  var pass=document.getElementById('login-pass').value;
+  var msg=document.getElementById('login-msg');
+  msg.className='auth-msg';msg.textContent='';
+  try{
+    var res=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    var d=await res.json();
+    if(!res.ok) throw new Error(d.detail||'Login gagal');
+    TOKEN=d.access_token;
+    localStorage.setItem('mj_token',TOKEN);
+    USER=d.user;QUOTA=d.quota;
+    updateAuthUI();closeAuth();loadQuota();
+  }catch(e){msg.className='auth-msg error';msg.textContent=e.message;}
+}
+
+async function doRegister(){
+  var email=document.getElementById('reg-email').value.trim();
+  var pass=document.getElementById('reg-pass').value;
+  var msg=document.getElementById('reg-msg');
+  msg.className='auth-msg';msg.textContent='';
+  try{
+    var res=await fetch('/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    var d=await res.json();
+    if(!res.ok) throw new Error(d.detail||'Gagal daftar');
+    msg.className='auth-msg success';msg.textContent='Berhasil! Cek email untuk verifikasi.';
+  }catch(e){msg.className='auth-msg error';msg.textContent=e.message;}
+}
+
+function doLogout(){
+  TOKEN=null;USER=null;QUOTA=null;
+  localStorage.removeItem('mj_token');
+  updateAuthUI();
+  document.getElementById('quotaBar').classList.remove('show');
+}
+
+async function loadQuota(){
+  if(!TOKEN) return;
+  try{
+    var res=await fetch('/quota',{headers:{'authorization':'Bearer '+TOKEN}});
+    if(res.status===401){doLogout();return;}
+    QUOTA=await res.json();
+    updateQuotaUI();
+  }catch(e){}
+}
+
+function updateAuthUI(){
+  var bar=document.getElementById('authActions');
+  var avatar=document.getElementById('authAvatar');
+  var emailEl=document.getElementById('authEmail');
+  var badge=document.getElementById('tierBadge');
+  if(TOKEN&&USER){
+    var initial=(USER.email||'U')[0].toUpperCase();
+    avatar.textContent=initial;
+    emailEl.textContent=USER.email;
+    var tier=QUOTA?QUOTA.tier:'free';
+    badge.textContent=tier.charAt(0).toUpperCase()+tier.slice(1);
+    badge.className='tier-badge tier-'+tier;
+    bar.innerHTML='<button class="btn-logout" onclick="doLogout()">Keluar</button>';
+    document.getElementById('quotaBar').classList.add('show');
+  } else {
+    avatar.textContent='?';
+    emailEl.textContent='Belum masuk';
+    badge.textContent='Free';badge.className='tier-badge tier-free';
+    bar.innerHTML='<button class="btn-login-prompt" onclick="openAuth()">Masuk</button>';
+  }
+}
+
+function updateQuotaUI(){
+  if(!QUOTA) return;
+  var cu=QUOTA.cari_used,cl=QUOTA.cari_limit;
+  var uu=QUOTA.upload_used,ul=QUOTA.upload_limit;
+  document.getElementById('qCariUsed').textContent=cu;
+  document.getElementById('qCariLimit').textContent=cl;
+  document.getElementById('qUploadUsed').textContent=uu;
+  document.getElementById('qUploadLimit').textContent=ul;
+  var cp=Math.min(100,Math.round(cu/cl*100));
+  var up=Math.min(100,Math.round(uu/ul*100));
+  var cf=document.getElementById('qCariFill');
+  var uf=document.getElementById('qUploadFill');
+  cf.style.width=cp+'%';cf.className='quota-fill'+(cp>=80?' danger':'');
+  uf.style.width=up+'%';uf.className='quota-fill'+(up>=80?' danger':'');
+  var tier=QUOTA.tier||'free';
+  var badge=document.getElementById('tierBadge');
+  badge.textContent=tier.charAt(0).toUpperCase()+tier.slice(1);
+  badge.className='tier-badge tier-'+tier;
+  if(QUOTA.reset_at){
+    var d=new Date(QUOTA.reset_at);
+    document.getElementById('qReset').textContent='Reset: '+d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+' WIB';
+  }
+  var showUpgrade=(cu>=cl||uu>=ul)&&tier!=='max';
+  document.getElementById('upgradeBox').classList.toggle('show',showUpgrade);
+  if(USER){
+    var tier2=QUOTA?QUOTA.tier:'free';
+    document.getElementById('tierBadge').textContent=tier2.charAt(0).toUpperCase()+tier2.slice(1);
+  }
+}
+
+function getAuthHeader(){
+  return TOKEN ? {'authorization':'Bearer '+TOKEN} : {};
+}
+
+// Auto-login dari token tersimpan
+(async function initAuth(){
+  if(!TOKEN) return;
+  try{
+    var res=await fetch('/auth/me',{headers:{'authorization':'Bearer '+TOKEN}});
+    if(res.status===401){doLogout();return;}
+    var d=await res.json();
+    USER=d.user;QUOTA=d.quota;
+    updateAuthUI();updateQuotaUI();
+  }catch(e){doLogout();}
+})();
 if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 
 let deferredPrompt = null;
