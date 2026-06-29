@@ -511,155 +511,222 @@ function startTyping(){
 
 // ── AUTH ──────────────────────────────────────────────────────
 var TOKEN = null;
-try { TOKEN = localStorage.getItem('mj_token') || sessionStorage.getItem('mj_token') || null; } catch(e) { TOKEN = null; }
 var USER = null;
 var QUOTA = null;
 
-function openAuth(e){ 
-  if(e) e.preventDefault(); 
-  var m = document.getElementById('authModal');
-  m.style.display = 'flex';
-  m.classList.add('show');
-}
-function closeAuth(){ 
-  var m = document.getElementById('authModal');
-  if(m){ m.classList.remove('show'); }
-}
-function closeAuth(){ document.getElementById('authModal').classList.remove('show'); }
-function switchTab(tab){
-  document.getElementById('tab-login').style.display = tab==='login'?'block':'none';
-  document.getElementById('tab-register').style.display = tab==='register'?'block':'none';
-  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1)));
+try { TOKEN = localStorage.getItem('mj_token'); } catch(e) {}
+try { if(!TOKEN) TOKEN = sessionStorage.getItem('mj_token'); } catch(e) {}
+
+function saveToken(t) {
+  TOKEN = t;
+  try { localStorage.setItem('mj_token', t); } catch(e) {}
+  try { sessionStorage.setItem('mj_token', t); } catch(e) {}
 }
 
-async function doLogin(){
-  var email=document.getElementById('login-email').value.trim();
-  var pass=document.getElementById('login-pass').value;
-  var msg=document.getElementById('login-msg');
-  msg.className='auth-msg';msg.textContent='';
-  try{
-    var res=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
-    var d=await res.json();
-    if(!res.ok) throw new Error(d.detail||'Login gagal');
-    TOKEN=d.access_token;
-    try { localStorage.setItem('mj_token',TOKEN); } catch(e) { try { sessionStorage.setItem('mj_token',TOKEN); } catch(e2) {} }
-    USER=d.user;QUOTA=d.quota;
-    updateAuthUI();closeAuth();loadQuota();
-  }catch(e){msg.className='auth-msg error';msg.textContent=e.message;}
-}
-
-async function doRegister(){
-  var email=document.getElementById('reg-email').value.trim();
-  var pass=document.getElementById('reg-pass').value;
-  var msg=document.getElementById('reg-msg');
-  msg.className='auth-msg';msg.textContent='';
-  try{
-    var res=await fetch('/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
-    var d=await res.json();
-    if(!res.ok) throw new Error(d.detail||'Gagal daftar');
-    msg.className='auth-msg success';msg.textContent='Berhasil! Cek email untuk verifikasi.';
-  }catch(e){msg.className='auth-msg error';msg.textContent=e.message;}
-}
-
-function doLogout(){
-  TOKEN=null;USER=null;QUOTA=null;
+function clearToken() {
+  TOKEN = null; USER = null; QUOTA = null;
   try { localStorage.removeItem('mj_token'); } catch(e) {}
-try { sessionStorage.removeItem('mj_token'); } catch(e) {}
+  try { sessionStorage.removeItem('mj_token'); } catch(e) {}
+}
+
+function openAuth(e) {
+  if(e) { e.preventDefault(); e.stopPropagation(); }
+  document.getElementById('authModal').classList.add('show');
+}
+
+function closeAuth() {
+  document.getElementById('authModal').classList.remove('show');
+}
+
+function openHamburger() { document.getElementById('hamburgerModal').classList.add('show'); }
+function closeHamburger() { document.getElementById('hamburgerModal').classList.remove('show'); }
+function toggleTierInfo() {
+  var el = document.getElementById('tierInfo');
+  if(el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('tab-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.querySelectorAll('.auth-tab').forEach(function(t, i) {
+    t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+  });
+}
+
+async function doLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  var pass = document.getElementById('login-pass').value;
+  var msg = document.getElementById('login-msg');
+  msg.className = 'auth-msg'; msg.textContent = '';
+  if(!email || !pass) { msg.className='auth-msg error'; msg.textContent='Isi email dan password!'; return; }
+  try {
+    var res = await fetch('/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email: email, password: pass})
+    });
+    var d = await res.json();
+    if(!res.ok) throw new Error(d.detail || 'Login gagal');
+    saveToken(d.access_token);
+    USER = d.user;
+    QUOTA = d.quota;
+    closeAuth();
+    updateAuthUI();
+    updateQuotaUI();
+    loadQuota();
+  } catch(e) {
+    msg.className = 'auth-msg error';
+    msg.textContent = e.message;
+  }
+}
+
+async function doRegister() {
+  var email = document.getElementById('reg-email').value.trim();
+  var pass = document.getElementById('reg-pass').value;
+  var msg = document.getElementById('reg-msg');
+  msg.className = 'auth-msg'; msg.textContent = '';
+  if(!email || !pass) { msg.className='auth-msg error'; msg.textContent='Isi email dan password!'; return; }
+  try {
+    var res = await fetch('/auth/register', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email: email, password: pass})
+    });
+    var d = await res.json();
+    if(!res.ok) throw new Error(d.detail || 'Gagal daftar');
+    msg.className = 'auth-msg success';
+    msg.textContent = 'Berhasil! Silakan masuk dengan akun kamu.';
+  } catch(e) {
+    msg.className = 'auth-msg error';
+    msg.textContent = e.message;
+  }
+}
+
+function doLogout() {
+  clearToken();
   updateAuthUI();
   document.getElementById('quotaBar').classList.remove('show');
 }
 
-async function loadQuota(){
+async function loadQuota() {
   if(!TOKEN) return;
-  try{
-    var res=await fetch('/quota',{headers:{'authorization':'Bearer '+TOKEN}});
-    if(res.status===401){doLogout();return;}
-    QUOTA=await res.json();
+  try {
+    var res = await fetch('/quota', {headers: {'authorization': 'Bearer ' + TOKEN}});
+    if(res.status === 401) { doLogout(); return; }
+    QUOTA = await res.json();
     updateQuotaUI();
-  }catch(e){}
+  } catch(e) { console.log('loadQuota error:', e); }
 }
 
-function updateAuthUI(){
-  var bar=document.getElementById('authActions');
-  var avatar=document.getElementById('authAvatar');
-  var emailEl=document.getElementById('authEmail');
-  var badge=document.getElementById('tierBadge');
-  if(TOKEN&&USER){
-    var initial=(USER.email||'U')[0].toUpperCase();
-    avatar.textContent=initial;
-    emailEl.textContent=USER.email;
-    var tier=QUOTA?QUOTA.tier:'free';
-    badge.textContent=tier.charAt(0).toUpperCase()+tier.slice(1);
-    badge.className='tier-badge tier-'+tier;
-    bar.innerHTML='<button class="btn-logout" onclick="doLogout()">Keluar</button>';
+function updateAuthUI() {
+  var avatar = document.getElementById('authAvatar');
+  var emailEl = document.getElementById('authEmail');
+  var badge = document.getElementById('tierBadge');
+  var actions = document.getElementById('authActions');
+  if(TOKEN && USER) {
+    avatar.textContent = (USER.email || 'U')[0].toUpperCase();
+    emailEl.textContent = USER.email;
+    var tier = (QUOTA && QUOTA.tier) ? QUOTA.tier : 'free';
+    badge.textContent = tier.charAt(0).toUpperCase() + tier.slice(1);
+    badge.className = 'tier-badge tier-' + tier;
+    actions.innerHTML = '<button class="btn-logout" onclick="doLogout()">Keluar</button>';
     document.getElementById('quotaBar').classList.add('show');
   } else {
-    avatar.textContent='?';
-    emailEl.textContent='Belum masuk';
-    badge.textContent='Free';badge.className='tier-badge tier-free';
-    bar.innerHTML='<button class="btn-login-prompt" onclick="openAuth()">Masuk</button>';
+    avatar.textContent = '?';
+    emailEl.textContent = 'Belum masuk';
+    badge.textContent = 'Free';
+    badge.className = 'tier-badge tier-free';
+    actions.innerHTML = '<button class="btn-login-prompt" onclick="openAuth(event)">Masuk</button>';
+    document.getElementById('quotaBar').classList.remove('show');
   }
 }
 
-function updateQuotaUI(){
+function updateQuotaUI() {
   if(!QUOTA) return;
-  var cu=QUOTA.cari_used,cl=QUOTA.cari_limit;
-  var uu=QUOTA.upload_used,ul=QUOTA.upload_limit;
-  document.getElementById('qCariUsed').textContent=cu||0;
-  document.getElementById('qCariLimit').textContent=cl||5;
-  document.getElementById('qUploadUsed').textContent=uu||0;
-  document.getElementById('qUploadLimit').textContent=ul||10;
-  var cp=Math.min(100,Math.round(cu/cl*100));
-  var up=Math.min(100,Math.round(uu/ul*100));
-  var cf=document.getElementById('qCariFill');
-  var uf=document.getElementById('qUploadFill');
-  cf.style.width=cp+'%';cf.className='quota-fill'+(cp>=80?' danger':'');
-  uf.style.width=up+'%';uf.className='quota-fill'+(up>=80?' danger':'');
-  var tier=QUOTA.tier||'free';
-  var badge=document.getElementById('tierBadge');
-  badge.textContent=tier.charAt(0).toUpperCase()+tier.slice(1);
-  badge.className='tier-badge tier-'+tier;
-  if(QUOTA.reset_at){
-    var d=new Date(QUOTA.reset_at);
-    document.getElementById('qReset').textContent='Reset: '+d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+' WIB';
+  var cu = QUOTA.cari_used || 0;
+  var cl = QUOTA.cari_limit || 5;
+  var uu = QUOTA.upload_used || 0;
+  var ul = QUOTA.upload_limit || 10;
+  
+  document.getElementById('qCariUsed').textContent = cu;
+  document.getElementById('qCariLimit').textContent = cl;
+  document.getElementById('qUploadUsed').textContent = uu;
+  document.getElementById('qUploadLimit').textContent = ul;
+  
+  var cp = cl > 0 ? Math.min(100, Math.round(cu/cl*100)) : 0;
+  var up = ul > 0 ? Math.min(100, Math.round(uu/ul*100)) : 0;
+  
+  var cf = document.getElementById('qCariFill');
+  var uf = document.getElementById('qUploadFill');
+  cf.style.width = cp + '%';
+  cf.className = 'quota-fill' + (cp >= 80 ? ' danger' : '');
+  uf.style.width = up + '%';
+  uf.className = 'quota-fill' + (up >= 80 ? ' danger' : '');
+  
+  var tier = QUOTA.tier || 'free';
+  var badge = document.getElementById('tierBadge');
+  badge.textContent = tier.charAt(0).toUpperCase() + tier.slice(1);
+  badge.className = 'tier-badge tier-' + tier;
+  
+  if(QUOTA.reset_at) {
+    var d = new Date(QUOTA.reset_at);
+    document.getElementById('qReset').textContent = 'Reset: ' + d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) + ' WIB';
   }
-  var showUpgrade=(cu>=cl||uu>=ul)&&tier!=='max';
-  document.getElementById('upgradeBox').classList.toggle('show',showUpgrade);
-  if(USER){
-    var tier2=QUOTA?QUOTA.tier:'free';
-    document.getElementById('tierBadge').textContent=tier2.charAt(0).toUpperCase()+tier2.slice(1);
-  }
+  
+  var showUpgrade = (cu >= cl || uu >= ul) && tier !== 'max';
+  document.getElementById('upgradeBox').classList.toggle('show', showUpgrade);
 }
 
-function getAuthHeader(){
-  return TOKEN ? {'authorization':'Bearer '+TOKEN} : {};
+function getAuthHeader() {
+  return TOKEN ? {'authorization': 'Bearer ' + TOKEN} : {};
 }
 
-// Auto-login dari token tersimpan
-(async function initAuth(){
+// Auto setup event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  // Close buttons
+  var closeMap = {
+    'closeAuthBtn': closeAuth,
+    'closeModalBtn': closeModal,
+    'closePreviewBtn': closePreview,
+    'closeAboutBtn': closeAbout,
+    'closeHamburgerBtn': closeHamburger
+  };
+  Object.keys(closeMap).forEach(function(id) {
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('click', function(e) { e.stopPropagation(); closeMap[id](); });
+  });
+  
+  // Overlay click to close
+  ['modal','previewModal','aboutModal','authModal','hamburgerModal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('click', function(e) { if(e.target === this) this.classList.remove('show'); });
+  });
+
+  // Prevent search input dari autofill email
+  var q = document.getElementById('query');
+  if(q) { q.setAttribute('autocomplete','off'); q.setAttribute('autocorrect','off'); }
+});
+
+// Auto login dari token tersimpan
+(async function initAuth() {
   if(!TOKEN) return;
-  try{
-    var res=await fetch('/auth/me',{headers:{'authorization':'Bearer '+TOKEN}});
-    if(res.status===401){
-      // Token expired - hapus dan reset
-      TOKEN=null;
-      try{localStorage.removeItem('mj_token');}catch(e){}
-      try{sessionStorage.removeItem('mj_token');}catch(e){}
-      updateAuthUI();
-      return;
-    }
-    var d=await res.json();
-    if(d.user){
-      USER=d.user;
-      QUOTA=d.quota;
+  try {
+    var res = await fetch('/auth/me', {headers: {'authorization': 'Bearer ' + TOKEN}});
+    if(res.status === 401) { clearToken(); updateAuthUI(); return; }
+    var d = await res.json();
+    if(d.user) {
+      USER = d.user;
+      QUOTA = d.quota;
       updateAuthUI();
       updateQuotaUI();
     }
-  }catch(e){
-    // Network error - jangan logout, biarkan state tetap
-    console.log('initAuth error:', e);
+  } catch(e) {
+    // Network error - jangan logout
+    console.log('initAuth network error:', e);
+    if(USER) updateAuthUI();
   }
 })();
+
 if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 
 // Setup semua modal close buttons
