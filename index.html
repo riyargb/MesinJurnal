@@ -251,7 +251,12 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
     </div>
     <div id="authActions">
       <button class="btn-login-prompt" onclick="openAuth(event)">Masuk</button>
-    </div>
+        <button onclick="openHamburger()" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;flex-direction:column;gap:4px;margin-left:4px;">
+        <span style="display:block;width:20px;height:2px;background:#1e3a8a;border-radius:2px;"></span>
+        <span style="display:block;width:20px;height:2px;background:#1e3a8a;border-radius:2px;"></span>
+        <span style="display:block;width:20px;height:2px;background:#1e3a8a;border-radius:2px;"></span>
+      </button>
+  </div>
   </div>
 
   <!-- Quota Bar -->
@@ -318,6 +323,69 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
   </div>
 </div>
 
+<!-- Hamburger Modal -->
+<div class="modal" id="hamburgerModal">
+  <div class="modal-box" style="border-radius:20px 20px 0 0;">
+    <div class="modal-header">
+      <div class="modal-title">Menu</div>
+      <button class="modal-close" id="closeHamburgerBtn">x</button>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">Paket Berlangganan</div>
+      
+      <div style="border:2px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:10px;" id="freeTierCard">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:15px;font-weight:700;color:#374151;">Free</span>
+          <span style="font-size:14px;font-weight:700;color:#374151;">Gratis</span>
+        </div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.6;">
+          5x cari jurnal per 5 jam<br>
+          10x upload referensi per 5 jam
+        </div>
+      </div>
+
+      <div style="border:2px solid #fbbf24;border-radius:10px;padding:14px;margin-bottom:10px;background:#fffbeb;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:15px;font-weight:700;color:#d97706;">Pro</span>
+          <span style="font-size:14px;font-weight:700;color:#d97706;">Rp50.000</span>
+        </div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.6;margin-bottom:10px;">
+          30x cari jurnal per 5 jam<br>
+          50x upload referensi per 5 jam<br>
+          Reset otomatis tiap 5 jam
+        </div>
+        <a href="https://saweria.co/Kikomaukiko?amount=50000" target="_blank" 
+           style="display:block;text-align:center;background:#d97706;color:white;padding:9px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;"
+           onclick="document.getElementById('hamburgerModal').classList.remove('show')">
+          Bayar via Saweria — Isi pesan dengan email akun
+        </a>
+      </div>
+
+      <div style="border:2px solid #a78bfa;border-radius:10px;padding:14px;background:#f5f3ff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:15px;font-weight:700;color:#7c3aed;">Max</span>
+          <span style="font-size:14px;font-weight:700;color:#7c3aed;">Rp100.000</span>
+        </div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.6;margin-bottom:10px;">
+          50x cari jurnal per 5 jam<br>
+          100x upload referensi per 5 jam<br>
+          Reset otomatis tiap 5 jam
+        </div>
+        <a href="https://saweria.co/Kikomaukiko?amount=100000" target="_blank"
+           style="display:block;text-align:center;background:#7c3aed;color:white;padding:9px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;"
+           onclick="document.getElementById('hamburgerModal').classList.remove('show')">
+          Bayar via Saweria — Isi pesan dengan email akun
+        </a>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:#9ca3af;text-align:center;padding-top:12px;border-top:1px solid #e8ecf0;">
+      Setelah bayar, tier akan terupdate otomatis dalam beberapa menit.
+    </div>
+  </div>
+</div>
+
 <!-- Auth Modal -->
 <div class="modal" id="authModal">
   <div class="auth-modal-box">
@@ -349,7 +417,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title" id="modal-title">Detail</div>
-      <button class="modal-close" onclick="closeModal()">x</button>
+      <button class="modal-close" id="closeModalBtn">x</button>
     </div>
     <div id="modal-body"></div>
   </div>
@@ -360,7 +428,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title">Preview PDF</div>
-      <button class="modal-close" onclick="closePreview()">x</button>
+      <button class="modal-close" id="closePreviewBtn">x</button>
     </div>
     <div id="preview-body"></div>
   </div>
@@ -423,6 +491,8 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
 
 <script>
 
+function openHamburger(){ document.getElementById('hamburgerModal').classList.add('show'); }
+function closeHamburger(){ document.getElementById('hamburgerModal').classList.remove('show'); }
 function toggleTierInfo(){
   var el = document.getElementById('tierInfo');
   if(el) el.style.display = el.style.display==='none'?'block':'none';
@@ -453,9 +523,7 @@ function openAuth(e){
 }
 function closeAuth(){ 
   var m = document.getElementById('authModal');
-  m.classList.remove('show');
-  m.style.display = 'none';
-  setTimeout(function(){ m.style.display = ''; }, 100);
+  if(m){ m.classList.remove('show'); }
 }
 function closeAuth(){ document.getElementById('authModal').classList.remove('show'); }
 function switchTab(tab){
@@ -593,6 +661,26 @@ function getAuthHeader(){
   }
 })();
 if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
+
+// Setup semua modal close buttons
+document.addEventListener('DOMContentLoaded', function(){
+  var closeMap = {
+    'closeAuthBtn': closeAuth,
+    'closeModalBtn': closeModal,
+    'closePreviewBtn': closePreview,
+    'closeAboutBtn': closeAbout,
+    'closeHamburgerBtn': closeHamburger
+  };
+  Object.keys(closeMap).forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('click', closeMap[id]);
+  });
+  // Close modal saat klik overlay
+  ['modal','previewModal','aboutModal','authModal','hamburgerModal'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
+  });
+});
 
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
