@@ -554,11 +554,25 @@ function getAuthHeader(){
   if(!TOKEN) return;
   try{
     var res=await fetch('/auth/me',{headers:{'authorization':'Bearer '+TOKEN}});
-    if(res.status===401){doLogout();return;}
+    if(res.status===401){
+      // Token expired - hapus dan reset
+      TOKEN=null;
+      try{localStorage.removeItem('mj_token');}catch(e){}
+      try{sessionStorage.removeItem('mj_token');}catch(e){}
+      updateAuthUI();
+      return;
+    }
     var d=await res.json();
-    USER=d.user;QUOTA=d.quota;
-    updateAuthUI();updateQuotaUI();
-  }catch(e){doLogout();}
+    if(d.user){
+      USER=d.user;
+      QUOTA=d.quota;
+      updateAuthUI();
+      updateQuotaUI();
+    }
+  }catch(e){
+    // Network error - jangan logout, biarkan state tetap
+    console.log('initAuth error:', e);
+  }
 })();
 if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 
