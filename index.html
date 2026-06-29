@@ -423,7 +423,8 @@ function startTyping(){
 }
 
 // ── AUTH ──────────────────────────────────────────────────────
-var TOKEN = localStorage.getItem('mj_token') || null;
+var TOKEN = null;
+try { TOKEN = localStorage.getItem('mj_token') || sessionStorage.getItem('mj_token') || null; } catch(e) { TOKEN = null; }
 var USER = null;
 var QUOTA = null;
 
@@ -445,7 +446,7 @@ async function doLogin(){
     var d=await res.json();
     if(!res.ok) throw new Error(d.detail||'Login gagal');
     TOKEN=d.access_token;
-    localStorage.setItem('mj_token',TOKEN);
+    try { localStorage.setItem('mj_token',TOKEN); } catch(e) { try { sessionStorage.setItem('mj_token',TOKEN); } catch(e2) {} }
     USER=d.user;QUOTA=d.quota;
     updateAuthUI();closeAuth();loadQuota();
   }catch(e){msg.className='auth-msg error';msg.textContent=e.message;}
@@ -466,7 +467,8 @@ async function doRegister(){
 
 function doLogout(){
   TOKEN=null;USER=null;QUOTA=null;
-  localStorage.removeItem('mj_token');
+  try { localStorage.removeItem('mj_token'); } catch(e) {}
+try { sessionStorage.removeItem('mj_token'); } catch(e) {}
   updateAuthUI();
   document.getElementById('quotaBar').classList.remove('show');
 }
