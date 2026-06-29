@@ -167,8 +167,9 @@ async def login(body: dict):
         raise HTTPException(401, "Email atau password salah")
 
 @app.get("/auth/me")
-async def me(authorization: str = None):
-    token = authorization.replace("Bearer ", "") if authorization else None
+async def me(request: Request):
+    auth = request.headers.get("authorization") or request.headers.get("Authorization") or ""
+    token = auth.replace("Bearer ", "").strip()
     if not token: raise HTTPException(401, "Unauthorized")
     user = get_user_from_token(token)
     if not user: raise HTTPException(401, "Token tidak valid")
@@ -176,8 +177,9 @@ async def me(authorization: str = None):
     return {"user": {"email": user.email, "id": user.id}, "quota": quota}
 
 @app.get("/quota")
-async def get_quota(authorization: str = None):
-    token = authorization.replace("Bearer ", "") if authorization else None
+async def get_quota_endpoint(request: Request):
+    auth = request.headers.get("authorization") or request.headers.get("Authorization") or ""
+    token = auth.replace("Bearer ", "").strip()
     if not token: raise HTTPException(401, "Unauthorized")
     user = get_user_from_token(token)
     if not user: raise HTTPException(401, "Token tidak valid")
@@ -193,6 +195,7 @@ async def get_quota(authorization: str = None):
         "saweria_pro": f"https://saweria.co/{SAWERIA_USERNAME}?amount={SAWERIA_PRO_AMOUNT}",
         "saweria_max": f"https://saweria.co/{SAWERIA_USERNAME}?amount={SAWERIA_MAX_AMOUNT}"
     }
+
 
 @app.post("/webhook/saweria")
 async def saweria_webhook(body: dict):
