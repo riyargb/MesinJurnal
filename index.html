@@ -73,7 +73,7 @@
   .app-footer { width: 100%; text-align: center; padding: 8px 0 0; }
   .about-btn { background: none; border: none; color: #9ca3af; font-size: 12px; cursor: pointer; padding: 6px 12px; border-radius: 6px; }
   .about-btn:hover { color: #1e3a8a; background: #f1f5f9; }
-  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: flex-end; }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: flex-end; }
   .modal.show { display: flex; }
   .modal-box { background: white; border-radius: 20px 20px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 680px; max-height: 88vh; overflow-y: auto; box-shadow: 0 -4px 32px rgba(0,0,0,0.12); }
   .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
@@ -250,7 +250,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
       </div>
     </div>
     <div id="authActions">
-      <button class="btn-login-prompt" onclick="openAuth()">Masuk</button>
+      <button class="btn-login-prompt" onclick="openAuth(event)">Masuk</button>
     </div>
   </div>
 
@@ -428,7 +428,17 @@ try { TOKEN = localStorage.getItem('mj_token') || sessionStorage.getItem('mj_tok
 var USER = null;
 var QUOTA = null;
 
-function openAuth(){ document.getElementById('authModal').classList.add('show'); }
+function openAuth(e){ 
+  if(e) e.preventDefault(); 
+  var m = document.getElementById('authModal');
+  m.style.display = 'flex';
+  m.classList.add('show');
+}
+function closeAuth(){ 
+  var m = document.getElementById('authModal');
+  m.classList.remove('show');
+  setTimeout(function(){ m.style.display = ''; }, 300);
+}
 function closeAuth(){ document.getElementById('authModal').classList.remove('show'); }
 function switchTab(tab){
   document.getElementById('tab-login').style.display = tab==='login'?'block':'none';
