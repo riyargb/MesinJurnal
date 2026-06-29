@@ -272,6 +272,19 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
       <div class="quota-track"><div class="quota-fill" id="qUploadFill" style="width:0%"></div></div>
     </div>
     <div class="quota-reset" id="qReset"></div>
+    <button onclick="toggleTierInfo()" style="font-size:12px;color:#1e3a8a;background:none;border:none;cursor:pointer;padding:4px 0;font-weight:600;margin-top:4px;">Lihat Paket Upgrade</button>
+    <div class="tier-info" id="tierInfo" style="margin-top:10px;display:none;">
+      <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Paket Tersedia</div>
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:700;color:#d97706;margin-bottom:3px;">Pro — Rp50.000/bulan</div>
+        <div style="font-size:12px;color:#6b7280;">30x cari jurnal · 50x upload · Reset tiap 5 jam</div>
+      </div>
+      <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:10px 12px;">
+        <div style="font-size:13px;font-weight:700;color:#7c3aed;margin-bottom:3px;">Max — Rp100.000/bulan</div>
+        <div style="font-size:12px;color:#6b7280;">50x cari jurnal · 100x upload · Reset tiap 5 jam</div>
+      </div>
+      <div style="font-size:11px;color:#6b7280;margin-top:8px;">Isi kolom <b>Pesan</b> dengan email akun kamu saat bayar.</div>
+    </div>
     <div class="upgrade-box" id="upgradeBox">
       <div class="upgrade-title">Upgrade untuk kuota lebih banyak</div>
       <div style="font-size:12px;color:#6b7280;margin-bottom:10px;">Isi kolom <b>Pesan</b> dengan email akun kamu agar tier otomatis terupdate.</div>
@@ -289,7 +302,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
   </div>
   <div class="section">
     <div class="section-title">Pencarian</div>
-    <input type="text" id="query" placeholder="Kata kunci pencarian jurnal..." onkeydown="if(event.key==='Enter') cariJurnal()">
+    <input type="text" id="query" placeholder="Kata kunci pencarian jurnal..." onkeydown="if(event.key==='Enter') cariJurnal()" autocomplete="off" autocorrect="off">
     <button class="btn btn-primary" onclick="cariJurnal()" id="btnCari">Cari Jurnal</button>
     <div id="hasil-cari"></div>
   </div>
@@ -317,7 +330,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
       <button class="auth-tab" onclick="switchTab('register')">Daftar</button>
     </div>
     <div id="tab-login">
-      <div class="auth-field"><label>Email</label><input type="email" id="login-email" placeholder="email@example.com"></div>
+      <div class="auth-field"><label>Email</label><input type="email" id="login-email" placeholder="email@example.com" autocomplete="email"></div>
       <div class="auth-field"><label>Password</label><input type="password" id="login-pass" placeholder="Password"></div>
       <button class="auth-submit" onclick="doLogin()">Masuk</button>
       <div class="auth-msg" id="login-msg"></div>
@@ -410,6 +423,10 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
 
 <script>
 
+function toggleTierInfo(){
+  var el = document.getElementById('tierInfo');
+  if(el) el.style.display = el.style.display==='none'?'block':'none';
+}
 function startTyping(){
   var bio='Mahasiswa aktif Universitas Terbuka (UPBJJ Jakarta Barat) yang passionate di bidang AI Engineering, Web Development, dan Cybersecurity.';
   var el=document.getElementById('typedBio');
@@ -437,7 +454,8 @@ function openAuth(e){
 function closeAuth(){ 
   var m = document.getElementById('authModal');
   m.classList.remove('show');
-  setTimeout(function(){ m.style.display = ''; }, 300);
+  m.style.display = 'none';
+  setTimeout(function(){ m.style.display = ''; }, 100);
 }
 function closeAuth(){ document.getElementById('authModal').classList.remove('show'); }
 function switchTab(tab){
@@ -519,10 +537,10 @@ function updateQuotaUI(){
   if(!QUOTA) return;
   var cu=QUOTA.cari_used,cl=QUOTA.cari_limit;
   var uu=QUOTA.upload_used,ul=QUOTA.upload_limit;
-  document.getElementById('qCariUsed').textContent=cu;
-  document.getElementById('qCariLimit').textContent=cl;
-  document.getElementById('qUploadUsed').textContent=uu;
-  document.getElementById('qUploadLimit').textContent=ul;
+  document.getElementById('qCariUsed').textContent=cu||0;
+  document.getElementById('qCariLimit').textContent=cl||5;
+  document.getElementById('qUploadUsed').textContent=uu||0;
+  document.getElementById('qUploadLimit').textContent=ul||10;
   var cp=Math.min(100,Math.round(cu/cl*100));
   var up=Math.min(100,Math.round(uu/ul*100));
   var cf=document.getElementById('qCariFill');
