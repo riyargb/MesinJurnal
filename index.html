@@ -307,7 +307,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
   </div>
   <div class="section">
     <div class="section-title">Pencarian</div>
-    <input type="search" id="query" placeholder="Kata kunci pencarian jurnal..." onkeydown="if(event.key==='Enter') cariJurnal()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="search_query">
+    <input type="text" id="query" placeholder="Kata kunci pencarian jurnal..." onkeydown="if(event.key==='Enter') cariJurnal()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="search_query">
     <button class="btn btn-primary" onclick="cariJurnal()" id="btnCari">Cari Jurnal</button>
     <div id="hasil-cari"></div>
   </div>
@@ -357,7 +357,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
         </div>
         <a href="https://saweria.co/Kikomaukiko?amount=50000" target="_blank" 
            style="display:block;text-align:center;background:#d97706;color:white;padding:9px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;position:relative;z-index:1;"
-           onclick="document.getElementById('hamburgerModal').classList.remove('show')">
+           >
           Bayar via Saweria — Isi pesan dengan email akun
         </a>
       </div>
@@ -374,7 +374,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
         </div>
         <a href="https://saweria.co/Kikomaukiko?amount=100000" target="_blank"
            style="display:block;text-align:center;background:#7c3aed;color:white;padding:9px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;position:relative;z-index:1;"
-           onclick="document.getElementById('hamburgerModal').classList.remove('show')">
+           >
           Bayar via Saweria — Isi pesan dengan email akun
         </a>
       </div>
@@ -976,7 +976,7 @@ async function cariJurnal() {
   btn.disabled=true; btn.textContent='Mencari...';
   document.getElementById('hasil-cari').innerHTML='<p class="loading">Mencari jurnal...</p>';
   try {
-    const res = await fetch('/cari?q='+encodeURIComponent(q));
+    const res = await fetch('/cari?q='+encodeURIComponent(q), {headers: getAuthHeader()});
     const data = await res.json();
     if (!data.hasil||data.hasil.length===0) { document.getElementById('hasil-cari').innerHTML='<p>Tidak ada hasil.</p>'; return; }
     allData = [...allData,...data.hasil];
@@ -1005,7 +1005,7 @@ async function uploadFile() {
   try {
     const form = new FormData();
     for (let f of files) form.append('files',f);
-    const res = await fetch('/upload',{method:'POST',body:form});
+    const res = await fetch('/upload',{method:'POST',body:form,headers:getAuthHeader()});
     const data = await res.json();
     if (data.error) { document.getElementById('hasil-upload').innerHTML=`<p class="error">${data.error}</p>`; return; }
     const containerId = 'upload-'+Date.now();
