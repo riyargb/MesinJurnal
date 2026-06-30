@@ -232,9 +232,10 @@ async def saweria_webhook(body: dict):
         return {"status": "error", "detail": str(e)}
 
 @app.get("/cari")
-async def cari_jurnal(q: str, authorization: str = None):
-    if authorization:
-        token = authorization.replace("Bearer ", "")
+async def cari_jurnal(q: str, request: Request):
+    auth = request.headers.get("authorization") or request.headers.get("Authorization") or ""
+    token = auth.replace("Bearer ", "").strip()
+    if token:
         user = get_user_from_token(token)
         if user:
             ok, used, limit, tier, reset_at = check_and_use_quota(user.id, "cari")
@@ -313,9 +314,10 @@ async def export_csv(data: list):
     return StreamingResponse(io.BytesIO(output.getvalue().encode()), media_type="text/csv", headers={"Content-Disposition":"attachment; filename=export.csv"})
 
 @app.post("/upload")
-async def upload_files(files: list[UploadFile] = File(...), authorization: str = None):
-    if authorization:
-        token = authorization.replace("Bearer ", "")
+async def upload_files(request: Request, files: list[UploadFile] = File(...)):
+    auth = request.headers.get("authorization") or request.headers.get("Authorization") or ""
+    token = auth.replace("Bearer ", "").strip()
+    if token:
         user = get_user_from_token(token)
         if user:
             ok, used, limit, tier, reset_at = check_and_use_quota(user.id, "upload")
