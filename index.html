@@ -307,7 +307,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
   </div>
   <div class="section">
     <div class="section-title">Pencarian</div>
-    <input type="text" id="query" placeholder="Kata kunci pencarian jurnal..." onkeydown="if(event.key==='Enter') cariJurnal()" autocomplete="off" autocorrect="off">
+    <input type="search" id="query" placeholder="Kata kunci pencarian jurnal..." onkeydown="if(event.key==='Enter') cariJurnal()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="search_query">
     <button class="btn btn-primary" onclick="cariJurnal()" id="btnCari">Cari Jurnal</button>
     <div id="hasil-cari"></div>
   </div>
@@ -324,7 +324,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
 </div>
 
 <!-- Hamburger Modal -->
-<div class="modal" id="hamburgerModal">
+<div class="modal" id="hamburgerModal" style="z-index:10001;">
   <div class="modal-box" style="border-radius:20px 20px 0 0;">
     <div class="modal-header">
       <div class="modal-title">Menu</div>
@@ -356,7 +356,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
           Reset otomatis tiap 5 jam
         </div>
         <a href="https://saweria.co/Kikomaukiko?amount=50000" target="_blank" 
-           style="display:block;text-align:center;background:#d97706;color:white;padding:9px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;"
+           style="display:block;text-align:center;background:#d97706;color:white;padding:9px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;position:relative;z-index:1;"
            onclick="document.getElementById('hamburgerModal').classList.remove('show')">
           Bayar via Saweria — Isi pesan dengan email akun
         </a>
@@ -373,7 +373,7 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
           Reset otomatis tiap 5 jam
         </div>
         <a href="https://saweria.co/Kikomaukiko?amount=100000" target="_blank"
-           style="display:block;text-align:center;background:#7c3aed;color:white;padding:9px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;"
+           style="display:block;text-align:center;background:#7c3aed;color:white;padding:9px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;position:relative;z-index:1;"
            onclick="document.getElementById('hamburgerModal').classList.remove('show')">
           Bayar via Saweria — Isi pesan dengan email akun
         </a>
@@ -398,8 +398,8 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
       <button class="auth-tab" onclick="switchTab('register')">Daftar</button>
     </div>
     <div id="tab-login">
-      <div class="auth-field"><label>Email</label><input type="email" id="login-email" placeholder="email@example.com" autocomplete="email"></div>
-      <div class="auth-field"><label>Password</label><input type="password" id="login-pass" placeholder="Password"></div>
+      <div class="auth-field"><label>Email</label><input type="text" id="login-email" placeholder="email@example.com" autocomplete="username" name="mj_email" inputmode="email"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" name="mj_password"></div>
       <button class="auth-submit" onclick="doLogin()">Masuk</button>
       <div class="auth-msg" id="login-msg"></div>
     </div>
@@ -572,8 +572,8 @@ async function doLogin() {
     QUOTA = d.quota;
     closeAuth();
     updateAuthUI();
-    updateQuotaUI();
-    loadQuota();
+    // Load quota fresh dari endpoint untuk dapat cari_limit dll
+    await loadQuota();
   } catch(e) {
     msg.className = 'auth-msg error';
     msg.textContent = e.message;
@@ -613,8 +613,12 @@ async function loadQuota() {
   try {
     var res = await fetch('/quota', {headers: {'authorization': 'Bearer ' + TOKEN}});
     if(res.status === 401) { doLogout(); return; }
-    QUOTA = await res.json();
+    var data = await res.json();
+    // Merge dengan QUOTA yang ada
+    QUOTA = Object.assign(QUOTA || {}, data);
+    updateAuthUI();
     updateQuotaUI();
+    return QUOTA;
   } catch(e) { console.log('loadQuota error:', e); }
 }
 
@@ -643,10 +647,11 @@ function updateAuthUI() {
 
 function updateQuotaUI() {
   if(!QUOTA) return;
+  // Support dua format: dari /login (raw DB) dan dari /quota (formatted)
   var cu = QUOTA.cari_used || 0;
-  var cl = QUOTA.cari_limit || 5;
+  var cl = QUOTA.cari_limit || (QUOTA.tier === 'pro' ? 30 : QUOTA.tier === 'max' ? 50 : 5);
   var uu = QUOTA.upload_used || 0;
-  var ul = QUOTA.upload_limit || 10;
+  var ul = QUOTA.upload_limit || (QUOTA.tier === 'pro' ? 50 : QUOTA.tier === 'max' ? 100 : 10);
   
   document.getElementById('qCariUsed').textContent = cu;
   document.getElementById('qCariLimit').textContent = cl;
