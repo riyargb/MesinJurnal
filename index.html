@@ -113,6 +113,7 @@
   .tier-free{background:#f1f5f9;color:#64748b;}
   .tier-pro{background:#fef3c7;color:#d97706;}
   .tier-max{background:#ede9fe;color:#7c3aed;}
+  .tier-infinite{background:linear-gradient(90deg,#f59e0b,#fbbf24);color:#1a1a2e;font-weight:800;}
   .quota-bar{width:100%;background:white;border-radius:12px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border:1px solid #e8ecf0;display:none;}
   .quota-bar.show{display:block;}
   .quota-title{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
@@ -649,9 +650,10 @@ function updateQuotaUI() {
   if(!QUOTA) return;
   // Support dua format: dari /login (raw DB) dan dari /quota (formatted)
   var cu = QUOTA.cari_used || 0;
-  var cl = QUOTA.cari_limit || (QUOTA.tier === 'pro' ? 30 : QUOTA.tier === 'max' ? 50 : 5);
+  var tier0 = QUOTA.tier || 'free';
+  var cl = QUOTA.cari_limit || (tier0==='infinite' ? 999999 : tier0==='pro' ? 30 : tier0==='max' ? 50 : 5);
   var uu = QUOTA.upload_used || 0;
-  var ul = QUOTA.upload_limit || (QUOTA.tier === 'pro' ? 50 : QUOTA.tier === 'max' ? 100 : 10);
+  var ul = QUOTA.upload_limit || (tier0==='infinite' ? 999999 : tier0==='pro' ? 50 : tier0==='max' ? 100 : 10);
   
   document.getElementById('qCariUsed').textContent = cu;
   document.getElementById('qCariLimit').textContent = cl;

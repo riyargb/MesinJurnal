@@ -33,9 +33,10 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 HTML = open(os.path.join(os.path.dirname(__file__), "../index.html")).read()
 
 TIER_LIMITS = {
-    "free": {"cari": 5, "upload": 10},
-    "pro":  {"cari": 30, "upload": 50},
-    "max":  {"cari": 50, "upload": 100},
+    "free":     {"cari": 5,   "upload": 10},
+    "pro":      {"cari": 30,  "upload": 50},
+    "max":      {"cari": 50,  "upload": 100},
+    "infinite": {"cari": 999999, "upload": 999999},
 }
 RESET_HOURS = 5
 
@@ -127,10 +128,15 @@ def parse_dt(s):
 def check_and_use_quota(user_id: str, action: str):
     quota = get_or_create_quota(user_id)
     tier = quota.get("tier", "free")
-    limit = TIER_LIMITS[tier][action]
+    limit = TIER_LIMITS.get(tier, TIER_LIMITS["free"])[action]
     used_key = f"{action}_used"
     used = quota.get(used_key, 0)
     reset_at = parse_dt(quota.get("reset_at"))
+
+    # Infinite tier - tidak ada limit dan reset
+    if tier == "infinite":
+        supabase.table("user_quota").update({used_key: used + 1}).eq("user_id", user_id).execute()
+        return True, used + 1, limit, tier, reset_at
 
     # Auto reset jika sudah lewat waktu
     if datetime.utcnow() > reset_at:
@@ -215,7 +221,10 @@ async def saweria_webhook(body: dict):
         email = message.replace("PRO-","").replace("MAX-","").strip()
         if not email: return {"status": "ignored"}
 
-        if amount >= SAWERIA_MAX_AMOUNT:
+        SAWERIA_INFINITE_AMOUNT = int(os.environ.get("SAWERIA_INFINITE_AMOUNT", "150000"))
+        if amount >= SAWERIA_INFINITE_AMOUNT:
+            tier = "infinite"
+        elif amount >= SAWERIA_MAX_AMOUNT:
             tier = "max"
         elif amount >= SAWERIA_PRO_AMOUNT:
             tier = "pro"
