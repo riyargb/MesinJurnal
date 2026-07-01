@@ -992,7 +992,7 @@ async function cariJurnal() {
     document.getElementById('hasil-cari').innerHTML = html;
     window['cards_'+containerId] = cards;
   } catch(e) { document.getElementById('hasil-cari').innerHTML=`<p class="error">${e.message}</p>`; }
-  finally { btn.disabled=false; btn.textContent='Cari Jurnal'; }
+  finally { btn.disabled=false; btn.textContent='Cari Jurnal'; if(TOKEN) loadQuota(); }
 }
 
 async function uploadFile() {
@@ -1020,7 +1020,7 @@ async function uploadFile() {
     document.getElementById('hasil-upload').innerHTML = html;
     window['cards_'+containerId] = cards;
   } catch(e) { document.getElementById('hasil-upload').innerHTML=`<p class="error">${e.message}</p>`; }
-  finally { btn.disabled=false; btn.textContent='Proses File'; }
+  finally { btn.disabled=false; btn.textContent='Proses File'; if(TOKEN) loadQuota(); }
 }
 </script>
 </body>
