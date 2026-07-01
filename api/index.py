@@ -116,22 +116,32 @@ def get_or_create_quota(user_id: str):
         supabase.table("user_quota").insert(new_quota).execute()
         return new_quota
 
+def parse_dt(s):
+    if not s: return datetime.utcnow()
+    try:
+        s = s.replace('+00:00','').replace('Z','').split('.')[0]
+        return datetime.strptime(s, '%Y-%m-%dT%H:%M:%S')
+    except:
+        return datetime.utcnow()
+
 def check_and_use_quota(user_id: str, action: str):
     quota = get_or_create_quota(user_id)
     tier = quota.get("tier", "free")
     limit = TIER_LIMITS[tier][action]
     used_key = f"{action}_used"
     used = quota.get(used_key, 0)
-    reset_at = datetime.fromisoformat(quota.get("reset_at", datetime.utcnow().isoformat()))
+    reset_at = parse_dt(quota.get("reset_at"))
 
     # Auto reset jika sudah lewat waktu
     if datetime.utcnow() > reset_at:
+        new_reset = (datetime.utcnow() + timedelta(hours=RESET_HOURS)).isoformat()
         supabase.table("user_quota").update({
             "cari_used": 0,
             "upload_used": 0,
-            "reset_at": (datetime.utcnow() + timedelta(hours=RESET_HOURS)).isoformat()
+            "reset_at": new_reset
         }).eq("user_id", user_id).execute()
         used = 0
+        reset_at = datetime.utcnow() + timedelta(hours=RESET_HOURS)
 
     if used >= limit:
         return False, used, limit, tier, reset_at
