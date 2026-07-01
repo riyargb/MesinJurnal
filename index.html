@@ -977,6 +977,13 @@ async function cariJurnal() {
   document.getElementById('hasil-cari').innerHTML='<p class="loading">Mencari jurnal...</p>';
   try {
     const res = await fetch('/cari?q='+encodeURIComponent(q), {headers: getAuthHeader()});
+    if(res.status === 429) {
+      const err = await res.json();
+      const msg = err.message || 'Kuota habis.';
+      document.getElementById('hasil-cari').innerHTML=`<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:14px;color:#dc2626;font-size:14px;">${msg}<br><br><button onclick="openHamburger()" style="background:#1e3a8a;color:white;border:none;padding:8px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;">Lihat Paket Upgrade</button></div>`;
+      loadQuota();
+      return;
+    }
     const data = await res.json();
     if (!data.hasil||data.hasil.length===0) { document.getElementById('hasil-cari').innerHTML='<p>Tidak ada hasil.</p>'; return; }
     allData = [...allData,...data.hasil];
@@ -1006,6 +1013,13 @@ async function uploadFile() {
     const form = new FormData();
     for (let f of files) form.append('files',f);
     const res = await fetch('/upload',{method:'POST',body:form,headers:getAuthHeader()});
+    if(res.status === 429) {
+      const err = await res.json();
+      const msg = err.message || 'Kuota upload habis.';
+      document.getElementById('hasil-upload').innerHTML=`<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:14px;color:#dc2626;font-size:14px;">${msg}<br><br><button onclick="openHamburger()" style="background:#1e3a8a;color:white;border:none;padding:8px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;">Lihat Paket Upgrade</button></div>`;
+      loadQuota();
+      return;
+    }
     const data = await res.json();
     if (data.error) { document.getElementById('hasil-upload').innerHTML=`<p class="error">${data.error}</p>`; return; }
     const containerId = 'upload-'+Date.now();
